@@ -243,5 +243,3 @@ type Tool<Input = unknown, Output = unknown, P = unknown> = {
 ---
 
 *更新日期：2026-04-15*
-
-*本书由 Claude Code 辅助生成与审定*
