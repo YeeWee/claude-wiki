@@ -28,7 +28,7 @@ export type Command = CommandBase &
 
 | 类型 | 执行方式 | 适用场景 | 文件示例 |
 |------|----------|----------|----------|
-| `prompt` | 展开为提示文本发送给模型 | 需要模型智能处理的任务 | `init.ts`, `commit.ts` |
+| `prompt` | 展开为提示文本发送给模型 | 需要模型智能处理的任务 | `init.ts`, `commit/` |
 | `local` | 本地同步执行返回结果 | 纯本地操作、无需 UI | `compact/compact.ts` |
 | `local-jsx` | 渲染 React/Ink UI 界面 | 需要用户交互的选择界面 | `config.tsx`, `mcp.tsx` |
 
@@ -229,7 +229,7 @@ Exclude:
 
 ### 19.4.1 命令定义
 
-`/commit` 命令定义在 `src/commands/commit.ts:57-92`：
+`/commit` 命令定义在 `src/commands/commit/index.ts`：
 
 ```typescript
 const command = {
@@ -259,7 +259,7 @@ const command = {
 
 ### 19.4.2 工具白名单
 
-定义在 `src/commands/commit.ts:6-10`：
+定义在 `src/commands/commit/index.ts`：
 
 ```typescript
 const ALLOWED_TOOLS = [
@@ -748,7 +748,7 @@ Claude Code 的内置命令系统展示了精巧的设计：
 | `src/types/command.ts` | 命令类型定义 |
 | `src/commands.ts` | 命令注册和查找 |
 | `src/commands/init.ts` | `/init` 项目初始化 |
-| `src/commands/commit.ts` | `/commit` 提交自动化 |
+| `src/commands/commit/index.ts` | `/commit` 提交自动化 |
 | `src/commands/review.ts` | `/review` PR 审查 |
 | `src/commands/compact/compact.ts` | `/compact` 上下文压缩 |
 | `src/commands/config/config.tsx` | `/config` 配置管理 |

@@ -143,13 +143,15 @@ claude-wiki/
 - `classDiagram` - 类型关系
 - `stateDiagram` - 状态流转
 
-### 代码行号引用
+### 代码引用规范
 
-所有代码分析标注精确行号：
+所有代码分析标注文件路径和功能区域：
 ```
-src/Tool.ts:362-695  - Tool 接口定义
-src/QueryEngine.ts:209-212 - submitMessage签名
+src/Tool.ts - Tool 接口定义（buildTool 工厂函数部分）
+src/QueryEngine.ts - submitMessage 方法（消息提交核心逻辑）
 ```
+
+> 注：具体行号可能随版本变化，请以最新源代码为准。
 
 ### 中文技术写作
 
@@ -185,7 +187,7 @@ sequenceDiagram
 ### 核心类型定义
 
 ```typescript
-// src/Tool.ts:362-695
+// src/Tool.ts - Tool 接口核心定义
 type Tool<Input = unknown, Output = unknown, P = unknown> = {
   name: string
   description: string
@@ -234,6 +236,12 @@ type Tool<Input = unknown, Output = unknown, P = unknown> = {
 
 ---
 
-*生成日期：2024-04-15*
+## ⚠️ 版权声明
 
-*本书由 Claude Code 辅助生成*
+本仓库基于 2026-03-31 从 Anthropic npm registry 泄露的 Claude Code 源码。所有原始源码版权归 Anthropic 所有。仅供学习和研究用途。
+
+---
+
+*更新日期：2026-04-15*
+
+*本书由 Claude Code 辅助生成与审定*

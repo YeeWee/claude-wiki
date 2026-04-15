@@ -17,7 +17,7 @@ AgentTool 是 Claude Code 实现多 Agent 协作的核心机制。它允许主 A
 
 ### 12.2.1 Agent 定义类型
 
-Agent 定义分为三类，定义在 `src/tools/AgentTool/loadAgentsDir.ts:106-166`：
+Agent 定义分为三类：
 
 ```typescript
 // Built-in agents - 内置 Agent
@@ -49,7 +49,7 @@ export type PluginAgentDefinition = BaseAgentDefinition & {
 
 ### 12.2.2 内置 Agent 类型
 
-内置 Agent 定义在 `src/tools/AgentTool/builtInAgents.ts:22-72`：
+内置 Agent 定义在 `src/tools/AgentTool/builtInAgents.ts`：
 
 | Agent 类型 | 说明 | 模型 | 特点 |
 |------------|------|------|------|
@@ -61,7 +61,7 @@ export type PluginAgentDefinition = BaseAgentDefinition & {
 | `Verification` | 验证 Agent | inherit | 验证代码变更 |
 | `fork` | Fork 子 Agent | inherit | 继承父上下文，bubble 权限 |
 
-**Explore Agent 示例**（`src/tools/AgentTool/built-in/exploreAgent.ts:64-83`）：
+**Explore Agent 示例**：
 
 ```typescript
 export const EXPLORE_AGENT: BuiltInAgentDefinition = {
@@ -89,7 +89,7 @@ Explore Agent 的关键特点：
 
 ### 12.2.3 Agent 选择流程
 
-Agent 选择逻辑在 `src/tools/AgentTool/AgentTool.tsx:318-356`：
+Agent 选择逻辑：
 
 ```mermaid
 flowchart TD
@@ -107,7 +107,7 @@ flowchart TD
     L --> M[继续执行]
 ```
 
-**Fork 子 Agent 特殊处理**（`src/tools/AgentTool/forkSubagent.ts:60-71`）：
+**Fork 子 Agent 特殊处理**：
 
 ```typescript
 export const FORK_AGENT = {
@@ -135,7 +135,7 @@ Fork Agent 的独特之处：
 
 ### 12.3.1 启动流程概览
 
-子 Agent 启动的完整流程定义在 `src/tools/AgentTool/AgentTool.tsx:239-765`：
+子 Agent 启动的完整流程：
 
 ```mermaid
 flowchart TD
@@ -176,7 +176,7 @@ flowchart TD
 
 ### 12.3.2 runAgent 核心函数
 
-`runAgent` 是子 Agent 执行的核心入口，定义在 `src/tools/AgentTool/runAgent.ts:248-860`：
+`runAgent` 是子 Agent 执行的核心入口：
 
 **核心参数**：
 
@@ -302,7 +302,7 @@ export async function* runAgent({
 
 ### 12.3.3 工具池组装
 
-子 Agent 使用独立的工具池，定义在 `src/tools/AgentTool/AgentTool.tsx:569-577`：
+子 Agent 使用独立的工具池：
 
 ```typescript
 const workerPermissionContext = {
@@ -312,7 +312,7 @@ const workerPermissionContext = {
 const workerTools = assembleToolPool(workerPermissionContext, appState.mcp.tools)
 ```
 
-**工具过滤规则**（`src/tools/AgentTool/agentToolUtils.ts:70-116`）：
+**工具过滤规则**：
 
 ```typescript
 export function filterToolsForAgent({
@@ -376,7 +376,7 @@ AgentTool({ isolation: 'worktree', ... })
 
 ### 12.4.2 Worktree 创建流程
 
-Worktree 创建逻辑在 `src/tools/AgentTool/AgentTool.tsx:583-593`：
+Worktree 创建逻辑：
 
 ```typescript
 let worktreeInfo: {...} | null = null
@@ -415,7 +415,7 @@ const MAX_WORKTREE_SLUG_LENGTH = 64
 
 ### 12.4.3 Worktree 清理
 
-Worktree 清理在 Agent 完成后执行（`src/tools/AgentTool/AgentTool.tsx:644-685`）：
+Worktree 清理在 Agent 完成后执行：
 
 ```typescript
 const cleanupWorktreeIfNeeded = async (): Promise<{
@@ -465,7 +465,7 @@ export async function hasWorktreeChanges(
 
 ### 12.4.4 Fork + Worktree 路径通知
 
-当 Fork Agent 在 Worktree 中运行时，会注入路径转换通知（`src/tools/AgentTool/forkSubagent.ts:205-210`）：
+当 Fork Agent 在 Worktree 中运行时，会注入路径转换通知：
 
 ```typescript
 export function buildWorktreeNotice(
@@ -488,7 +488,7 @@ changes stay in this worktree and will not affect the parent's files.`
 
 ### 12.5.1 异步执行触发条件
 
-后台执行触发逻辑（`src/tools/AgentTool/AgentTool.tsx:567`）：
+后台执行触发逻辑：
 
 ```typescript
 const shouldRunAsync = (
@@ -503,7 +503,7 @@ const shouldRunAsync = (
 
 ### 12.5.2 异步 Agent 注册
 
-异步 Agent 注册流程（`src/tools/AgentTool/AgentTool.tsx:686-698`）：
+异步 Agent 注册流程：
 
 ```typescript
 const agentBackgroundTask = registerAsyncAgent({
@@ -554,7 +554,7 @@ export function registerAsyncAgent({
 
 ### 12.5.3 异步 Agent 生命周期
 
-`runAsyncAgentLifecycle` 驱动后台 Agent 从启动到完成（`src/tools/AgentTool/agentToolUtils.ts:508-686`）：
+`runAsyncAgentLifecycle` 驱动后台 Agent 从启动到完成：
 
 ```typescript
 export async function runAsyncAgentLifecycle({
@@ -641,7 +641,7 @@ Agent 完成通知以 `<task-notification>` XML 格式发送（定义在 `src/co
 </task-notification>
 ```
 
-**Coordinator 模式下的通知处理**（`src/coordinator/coordinatorMode.ts:143-185`）：
+**Coordinator 模式下的通知处理**：
 
 Coordinator 接收 Worker 的结果通知并综合处理：
 
@@ -661,7 +661,7 @@ Coordinator 接收 Worker 的结果通知并综合处理：
 
 ### 12.6.1 Teammate 创建
 
-Teammate 是多 Agent 协作的核心概念，通过 `spawnTeammate` 创建（`src/tools/shared/spawnMultiAgent.ts:1088-1093`）：
+Teammate 是多 Agent 协作的核心概念，通过 `spawnTeammate` 创建：
 
 ```typescript
 export async function spawnTeammate(
@@ -672,7 +672,7 @@ export async function spawnTeammate(
 }
 ```
 
-**执行模式选择**（`src/tools/shared/spawnMultiAgent.ts:1040-1078`）：
+**执行模式选择**：
 
 ```typescript
 async function handleSpawn(
@@ -707,7 +707,7 @@ async function handleSpawn(
 
 In-Process Teammate 在同一 Node.js 进程中运行，使用 AsyncLocalStorage 实现上下文隔离。
 
-**核心流程**（`src/tools/shared/spawnMultiAgent.ts:840-1032`）：
+**核心流程**：
 
 ```typescript
 async function handleSpawnInProcess(
@@ -870,7 +870,7 @@ export function isCoordinatorMode(): boolean {
 
 ### 12.7.2 Coordinator 系统提示
 
-Coordinator 的系统提示定义了其角色和工作流程（`src/coordinator/coordinatorMode.ts:111-369`）：
+Coordinator 的系统提示定义了其角色和工作流程：
 
 **核心角色**：
 
@@ -908,7 +908,7 @@ simultaneously.**
 
 ### 12.7.3 Worker 工具配置
 
-Coordinator 模式下 Worker 的工具配置（`src/coordinator/coordinatorMode.ts:80-108`）：
+Coordinator 模式下 Worker 的工具配置：
 
 ```typescript
 export function getCoordinatorUserContext(

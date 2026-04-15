@@ -31,7 +31,7 @@
 `QueryEngine` 是对话流程的核心类，负责管理整个对话的生命周期。其设计理念是：**一个 QueryEngine 实例对应一个对话会话，每次 `submitMessage()` 调用开启一个新的轮次**。
 
 ```typescript
-// QueryEngine.ts:184-207
+// QueryEngine.ts（注：对话引擎源码为 TypeScript）
 export class QueryEngine {
   private config: QueryEngineConfig
   private mutableMessages: Message[]
@@ -69,7 +69,7 @@ export class QueryEngine {
 `submitMessage` 是开启新轮次的入口方法，返回一个异步生成器：
 
 ```typescript
-// QueryEngine.ts:209-238
+// QueryEngine.ts
 async *submitMessage(
   prompt: string | ContentBlockParam[],
   options?: { uuid?: string; isMeta?: boolean },
@@ -167,7 +167,7 @@ sequenceDiagram
 `query.ts` 中的 `State` 类型定义了跨轮次的可变状态：
 
 ```typescript
-// query.ts:204-217
+// query.ts
 type State = {
   messages: Message[]
   toolUseContext: ToolUseContext
@@ -198,7 +198,7 @@ type State = {
 核心的 `while(true)` 循环处理每一轮的 API 请求和工具执行：
 
 ```typescript
-// query.ts:306-321
+// query.ts
 while (true) {
   let { toolUseContext } = state
   const { messages, autoCompactTracking, turnCount, ... } = state
@@ -229,7 +229,7 @@ while (true) {
 当循环需要继续时，通过更新 `state` 对象实现状态传递：
 
 ```typescript
-// query.ts:1099-1116 (collapse_drain_retry 示例)
+// query.ts collapse_drain_retry 示例
 if (drained.committed > 0) {
   const next: State = {
     messages: drained.messages,
@@ -272,7 +272,7 @@ type Continue =
 `StreamingToolExecutor` 实现了工具的并发执行控制：
 
 ```typescript
-// StreamingToolExecutor.ts:40-62
+// StreamingToolExecutor.ts
 export class StreamingToolExecutor {
   private tools: TrackedTool[] = []
   private toolUseContext: ToolUseContext
@@ -296,7 +296,7 @@ export class StreamingToolExecutor {
 工具状态追踪：
 
 ```typescript
-// StreamingToolExecutor.ts:19-32
+// StreamingToolExecutor.ts
 type ToolStatus = 'queued' | 'executing' | 'completed' | 'yielded'
 
 type TrackedTool = {
@@ -317,7 +317,7 @@ type TrackedTool = {
 并发控制的核心规则：
 
 ```typescript
-// StreamingToolExecutor.ts:129-135
+// StreamingToolExecutor.ts
 private canExecuteTool(isConcurrencySafe: boolean): boolean {
   const executingTools = this.tools.filter(t => t.status === 'executing')
   return (
@@ -338,7 +338,7 @@ private canExecuteTool(isConcurrencySafe: boolean): boolean {
 流式处理的核心循环：
 
 ```typescript
-// query.ts:659-863
+// query.ts
 for await (const message of deps.callModel({...})) {
   // 处理 fallback 情况
   if (streamingFallbackOccured) {
@@ -385,7 +385,7 @@ for await (const message of deps.callModel({...})) {
 进度消息在工具执行过程中实时 yield：
 
 ```typescript
-// StreamingToolExecutor.ts:366-375
+// StreamingToolExecutor.ts
 if (update.message) {
   if (update.message.type === 'progress') {
     tool.pendingProgress.push(update.message)
@@ -421,7 +421,7 @@ Claude Code 处理多种类型的错误：
 当收到 413 错误时，系统会尝试两级恢复：
 
 ```typescript
-// query.ts:1085-1183
+// query.ts
 const isWithheld413 =
   lastMessage?.type === 'assistant' &&
   lastMessage.isApiErrorMessage &&
@@ -459,7 +459,7 @@ return { reason: 'prompt_too_long' }
 输出 token 限制恢复使用两级策略：
 
 ```typescript
-// query.ts:1188-1256
+// query.ts
 if (isWithheldMaxOutputTokens(lastMessage)) {
   // 第一级：escalate (从 8k 提升到 64k)
   const capEnabled = getFeatureValue_CACHED_MAY_BE_STALE('tengu_otk_slot_v1', false)
@@ -493,7 +493,7 @@ if (isWithheldMaxOutputTokens(lastMessage)) {
 当遇到高负载或不可用情况时，系统会自动降级到备用模型：
 
 ```typescript
-// query.ts:893-950
+// query.ts
 try {
   // ... API 循环
 } catch (innerError) {
@@ -536,7 +536,7 @@ try {
 用户中断请求时的处理流程：
 
 ```typescript
-// query.ts:1011-1052
+// query.ts
 if (toolUseContext.abortController.signal.aborted) {
   if (streamingToolExecutor) {
     // 消耗剩余结果（生成合成 tool_result）

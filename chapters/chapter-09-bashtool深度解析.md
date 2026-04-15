@@ -86,7 +86,7 @@ sequenceDiagram
 
 ### 9.2.2 入口函数分析
 
-BashTool 的核心入口是 `call` 函数，定义在 `src/tools/BashTool/BashTool.tsx:624-819`：
+BashTool 的核心入口是 `call` 函数，定义在 `src/tools/BashTool/BashTool.tsx`：
 
 ```typescript
 async call(input: BashToolInput, toolUseContext, _canUseTool?, parentMessage?, onProgress?) {
@@ -140,7 +140,7 @@ async call(input: BashToolInput, toolUseContext, _canUseTool?, parentMessage?, o
 
 关键设计要点：
 
-1. **模拟 Sed 编辑**：`_simulatedSedEdit` 字段用于权限预览后的直接应用，确保用户预览的内容就是实际写入的内容（`BashTool.tsx:360-419`）
+1. **模拟 Sed 编辑**：`_simulatedSedEdit` 字段用于权限预览后的直接应用，确保用户预览的内容就是实际写入的内容
 
 2. **输出累积器**：`EndTruncatingAccumulator` 用于高效处理大输出，只保留末尾内容以显示最新的错误信息
 
@@ -148,7 +148,7 @@ async call(input: BashToolInput, toolUseContext, _canUseTool?, parentMessage?, o
 
 ### 9.2.3 runShellCommand Generator
 
-命令执行的 Generator 实现（`BashTool.tsx:826-999`）：
+命令执行的 Generator 实现：
 
 ```typescript
 async function* runShellCommand({
@@ -259,7 +259,7 @@ flowchart TB
 
 ### 9.3.2 shouldUseSandbox 函数
 
-沙箱启用判断的核心函数（`src/tools/BashTool/shouldUseSandbox.ts:130-153`）：
+沙箱启用判断的核心函数：
 
 ```typescript
 export function shouldUseSandbox(input: Partial<SandboxInput>): boolean {
@@ -292,7 +292,7 @@ export function shouldUseSandbox(input: Partial<SandboxInput>): boolean {
 
 ### 9.3.3 排除命令检测
 
-`containsExcludedCommand` 函数（`shouldUseSandbox.ts:21-128`）负责检测用户配置的不需要沙箱的命令：
+`containsExcludedCommand` 函数负责检测用户配置的不需要沙箱的命令：
 
 ```typescript
 function containsExcludedCommand(command: string): boolean {
@@ -347,7 +347,7 @@ function containsExcludedCommand(command: string): boolean {
 
 ### 9.3.4 SandboxManager 适配器
 
-`SandboxManager` 是沙箱系统的 CLI 适配层（`src/utils/sandbox/sandbox-adapter.ts:927-967`）：
+`SandboxManager` 是沙箱系统的 CLI 适配层：
 
 ```typescript
 export const SandboxManager: ISandboxManager = {
@@ -394,7 +394,7 @@ export const SandboxManager: ISandboxManager = {
 
 ### 9.3.5 安全配置转换
 
-配置转换函数（`sandbox-adapter.ts:172-381`）将 Claude Code 设置转换为沙箱运行时配置：
+配置转换函数将 Claude Code 设置转换为沙箱运行时配置：
 
 ```typescript
 export function convertToSandboxRuntimeConfig(
@@ -515,7 +515,7 @@ flowchart TB
 权限检查的入口函数（`bashPermissions.ts`，核心逻辑分布在多个辅助函数中）：
 
 ```typescript
-// 精确匹配检查（bashPermissions.ts:991-1048）
+// 精确匹配检查
 export const bashToolCheckExactMatchPermission = (
   input: z.infer<typeof BashTool.inputSchema>,
   toolPermissionContext: ToolPermissionContext,
@@ -563,7 +563,7 @@ export const bashToolCheckExactMatchPermission = (
 
 ### 9.4.3 规则匹配逻辑
 
-规则匹配函数（`bashPermissions.ts:778-935`）处理三种匹配模式：
+规则匹配函数处理三种匹配模式：
 
 ```typescript
 function filterRulesByContentsMatchingInput(
@@ -632,7 +632,7 @@ function filterRulesByContentsMatchingInput(
 
 ### 9.4.4 安全环境变量白名单
 
-`SAFE_ENV_VARS` 定义了可以安全剥离的环境变量（`bashPermissions.ts:378-430`）：
+`SAFE_ENV_VARS` 定义了可以安全剥离的环境变量：
 
 ```typescript
 const SAFE_ENV_VARS = new Set([
@@ -673,7 +673,7 @@ const SAFE_ENV_VARS = new Set([
 `bashSecurity.ts` 提供深度安全检查，检测潜在的命令注入和危险模式：
 
 ```typescript
-// 检测危险模式（bashSecurity.ts:16-41）
+// 检测危险模式
 const COMMAND_SUBSTITUTION_PATTERNS = [
   { pattern: /<\(/, message: 'process substitution <()' },
   { pattern: />\(/, message: 'process substitution >()' },
@@ -685,7 +685,7 @@ const COMMAND_SUBSTITUTION_PATTERNS = [
   { pattern: /\(e:/, message: 'Zsh-style glob qualifiers' },
 ];
 
-// Zsh 危险命令（bashSecurity.ts:45-74）
+// Zsh 危险命令
 const ZSH_DANGEROUS_COMMANDS = new Set([
   'zmodload',   // 模块加载入口
   'emulate',    // eval 等价物
@@ -710,7 +710,6 @@ const ZSH_DANGEROUS_COMMANDS = new Set([
 BashTool 使用 `EndTruncatingAccumulator` 处理大输出，保留末尾内容：
 
 ```typescript
-// BashTool.tsx:636
 const stdoutAccumulator = new EndTruncatingAccumulator();
 ```
 
@@ -722,7 +721,7 @@ const stdoutAccumulator = new EndTruncatingAccumulator();
 
 ### 9.5.2 进度消息格式
 
-进度消息的数据结构（`BashTool.tsx:844-853`）：
+进度消息的数据结构：
 
 ```typescript
 type ProgressData = {
@@ -739,7 +738,7 @@ type ProgressData = {
 
 ### 9.5.3 大输出持久化
 
-当输出超过阈值时，系统将其持久化到磁盘（`BashTool.tsx:732-753`）：
+当输出超过阈值时，系统将其持久化到磁盘：
 
 ```typescript
 const MAX_PERSISTED_SIZE = 64 * 1024 * 1024;  // 64 MB
@@ -810,7 +809,7 @@ BashTool 支持三种后台执行触发方式：
 
 ### 9.6.2 后台任务实现
 
-后台任务的启动逻辑（`BashTool.tsx:904-963`）：
+后台任务的启动逻辑：
 
 ```typescript
 // 后台任务启动辅助函数
@@ -865,7 +864,7 @@ function startBackgrounding(eventName: string, backgroundFn?) {
 
 ### 9.6.3 自动后台化配置
 
-自动后台化的控制变量（`BashTool.tsx:54-58, 220-226`）：
+自动后台化的控制变量：
 
 ```typescript
 const PROGRESS_THRESHOLD_MS = 2000;  // 2秒后显示进度
@@ -881,7 +880,7 @@ const isBackgroundTasksDisabled =
 
 ### 9.6.4 Kairos 自动后台化
 
-在 Kairos 模式下，主线程的阻塞命令会自动后台化（`BashTool.tsx:976-983`）：
+在 Kairos 模式下，主线程的阻塞命令会自动后台化：
 
 ```typescript
 if (feature('KAIROS') && getKairosActive() && isMainThread && 
@@ -897,7 +896,7 @@ if (feature('KAIROS') && getKairosActive() && isMainThread &&
 
 ### 9.6.5 后台任务结果返回
 
-后台任务的结果格式（`BashTool.tsx:555-622`）：
+后台任务的结果格式：
 
 ```typescript
 mapToolResultToToolResultBlockParam({
@@ -975,8 +974,8 @@ BashTool 的架构为设计安全执行系统提供了宝贵经验：
 
 ## 参考资料
 
-- `src/tools/BashTool/BashTool.tsx:420-825` - 工具核心实现
-- `src/tools/BashTool/bashPermissions.ts:991-1177` - 权限检查流程
-- `src/tools/BashTool/bashSecurity.ts:1-500` - 安全验证逻辑
-- `src/utils/sandbox/sandbox-adapter.ts:172-381` - 配置转换
+- `src/tools/BashTool/BashTool.tsx` - 工具核心实现
+- `src/tools/BashTool/bashPermissions.ts` - 权限检查流程
+- `src/tools/BashTool/bashSecurity.ts` - 安全验证逻辑
+- `src/utils/sandbox/sandbox-adapter.ts` - 配置转换
 - `src/utils/permissions/bashClassifier.ts` - 命令分类器

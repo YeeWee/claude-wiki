@@ -48,7 +48,7 @@ Claude Code 的类型系统遵循以下设计原则：
 `Tool` 类型是一个高度泛化的接口，支持三种泛型参数：
 
 ```typescript
-// src/Tool.ts:362-695
+// src/Tool.ts 中的 Tool 泛型接口定义
 export type Tool<
   Input extends AnyObject = AnyObject,   // 输入验证 schema 类型
   Output = unknown,                       // 输出数据类型
@@ -69,16 +69,16 @@ export type Tool<
 `Tool` 接口的字段定义涵盖了工具的标识、能力声明和配置信息：
 
 ```typescript
-// src/Tool.ts:369-456（字段部分）
+// src/Tool.ts 中的 Tool 核心字段定义
 {
   // 别名支持（向后兼容）
-  aliases?: string[]                        // 第 369-371 行
+  aliases?: string[]
 
   // ToolSearch 关键字提示
-  searchHint?: string                       // 第 374-378 行
+  searchHint?: string
 
   // 核心执行方法
-  call(                                     // 第 379-385 行
+  call(
     args: z.infer<Input>,
     context: ToolUseContext,
     canUseTool: CanUseToolFn,
@@ -87,7 +87,7 @@ export type Tool<
   ): Promise<ToolResult<Output>>
 
   // 描述生成方法
-  description(                              // 第 386-393 行
+  description(
     input: z.infer<Input>,
     options: {
       isNonInteractiveSession: boolean
@@ -97,40 +97,40 @@ export type Tool<
   ): Promise<string>
 
   // 输入验证 schema
-  readonly inputSchema: Input               // 第 394 行
+  readonly inputSchema: Input
 
   // JSON Schema 格式（MCP 工具专用）
-  readonly inputJSONSchema?: ToolInputJSONSchema  // 第 395-397 行
+  readonly inputJSONSchema?: ToolInputJSONSchema
 
   // 输出验证 schema
-  outputSchema?: z.ZodType<unknown>         // 第 400 行
+  outputSchema?: z.ZodType<unknown>
 
   // 是否启用
-  isEnabled(): boolean                      // 第 403 行
+  isEnabled(): boolean
 
   // 并发安全检查
-  isConcurrencySafe(input: z.infer<Input>): boolean  // 第 402 行
+  isConcurrencySafe(input: z.infer<Input>): boolean
 
   // 只读操作检查
-  isReadOnly(input: z.infer<Input>): boolean  // 第 404 行
+  isReadOnly(input: z.infer<Input>): boolean
 
   // 破坏性操作检查
-  isDestructive?(input: z.infer<Input>): boolean  // 第 406 行
+  isDestructive?(input: z.infer<Input>): boolean
 
   // 工具唯一标识名
-  readonly name: string                     // 第 456 行
+  readonly name: string
 
   // 结果最大字符数限制
-  maxResultSizeChars: number                // 第 466 行
+  maxResultSizeChars: number
 
   // 延迟加载标记
-  readonly shouldDefer?: boolean            // 第 442 行
+  readonly shouldDefer?: boolean
 
   // 始终加载标记
-  readonly alwaysLoad?: boolean             // 第 449 行
+  readonly alwaysLoad?: boolean
 
   // MCP 服务器信息
-  mcpInfo?: { serverName: string; toolName: string }  // 第 455 行
+  mcpInfo?: { serverName: string; toolName: string }
 }
 ```
 
@@ -139,7 +139,7 @@ export type Tool<
 `ToolUseContext` 是工具执行时的上下文类型，包含了工具需要的所有环境和状态信息：
 
 ```typescript
-// src/Tool.ts:158-300
+// src/Tool.ts 中的 ToolUseContext 类型定义
 export type ToolUseContext = {
   options: {
     commands: Command[]                     // 可用命令列表
@@ -189,7 +189,7 @@ export type ToolUseContext = {
 `ToolResult` 定义了工具执行的返回结构：
 
 ```typescript
-// src/Tool.ts:321-336
+// src/Tool.ts 中的 ToolResult 类型定义
 export type ToolResult<T> = {
   data: T                                   // 主要结果数据
   newMessages?: (                           // 可选的新消息
@@ -213,7 +213,7 @@ export type ToolResult<T> = {
 `Tools` 类型是不可变的工具集合：
 
 ```typescript
-// src/Tool.ts:700-701
+// src/Tool.ts 中的 Tools 集合类型定义
 export type Tools = readonly Tool[]
 ```
 
@@ -224,7 +224,7 @@ export type Tools = readonly Tool[]
 `buildTool()` 函数简化工具定义，提供安全默认值：
 
 ```typescript
-// src/Tool.ts:757-792
+// src/Tool.ts 中的 buildTool 工厂函数和默认值
 const TOOL_DEFAULTS = {
   isEnabled: () => true,                    // 默认启用
   isConcurrencySafe: (_input?: unknown) => false,  // 默认不安全（失败关闭）
@@ -262,7 +262,7 @@ export function buildTool<D extends AnyToolDef>(def: D): BuiltTool<D> {
 `Command` 是一个联合类型，由基础类型和具体命令类型组成：
 
 ```typescript
-// src/types/command.ts:205-206
+// src/types/command.ts 中的 Command 联合类型定义
 export type Command = CommandBase &
   (PromptCommand | LocalCommand | LocalJSXCommand)
 ```
@@ -280,7 +280,7 @@ export type Command = CommandBase &
 所有命令共享的基础字段：
 
 ```typescript
-// src/types/command.ts:175-203
+// src/types/command.ts 中的 CommandBase 类型定义
 export type CommandBase = {
   availability?: CommandAvailability[]       // 可用性限制
   description: string                        // 命令描述
@@ -308,7 +308,7 @@ export type CommandBase = {
 `PromptCommand` 定义了生成提示内容的命令类型：
 
 ```typescript
-// src/types/command.ts:25-57
+// src/types/command.ts 中的 PromptCommand 类型定义
 export type PromptCommand = {
   type: 'prompt'
   progressMessage: string                    // 进度消息
@@ -346,7 +346,7 @@ export type PromptCommand = {
 `LocalCommand` 定义懒加载的本地命令：
 
 ```typescript
-// src/types/command.ts:74-78
+// src/types/command.ts 中的 LocalCommand 类型定义
 type LocalCommand = {
   type: 'local'
   supportsNonInteractive: boolean            // 是否支持非交互模式
@@ -369,7 +369,7 @@ export type LocalCommandCall = (
 `LocalJSXCommand` 定义返回 React 组件的命令：
 
 ```typescript
-// src/types/command.ts:144-152
+// src/types/command.ts 中的 LocalJSXCommand 类型定义
 type LocalJSXCommand = {
   type: 'local-jsx'
   load: () => Promise<LocalJSXCommandModule> // 懒加载函数
@@ -389,7 +389,7 @@ export type LocalJSXCommandCall = (
 ### 5.3.6 LocalCommandResult 结果类型
 
 ```typescript
-// src/types/command.ts:16-23
+// src/types/command.ts 中的 LocalCommandResult 类型定义
 export type LocalCommandResult =
   | { type: 'text'; value: string }          // 文本结果
   | { type: 'compact'; compactionResult: CompactionResult; displayText?: string }  // 压缩结果
@@ -399,7 +399,7 @@ export type LocalCommandResult =
 ### 5.3.7 CommandAvailability 可用性类型
 
 ```typescript
-// src/types/command.ts:169-173
+// src/types/command.ts 中的 CommandAvailability 类型定义
 export type CommandAvailability =
   | 'claude-ai'    // claude.ai OAuth 用户（Pro/Max/Team/Enterprise）
   | 'console'      // Console API key 用户（api.anthropic.com 直连）
@@ -416,7 +416,7 @@ export type CommandAvailability =
 `TaskState` 是所有具体任务状态类型的联合：
 
 ```typescript
-// src/tasks/types.ts:12-19
+// src/tasks/types.ts 中的 TaskState 联合类型定义
 export type TaskState =
   | LocalShellTaskState
   | LocalAgentTaskState
@@ -444,7 +444,7 @@ export type TaskState =
 `BackgroundTaskState` 定义可在后台指示器显示的任务：
 
 ```typescript
-// src/tasks/types.ts:22-29
+// src/tasks/types.ts 中的 BackgroundTaskState 类型定义
 export type BackgroundTaskState =
   | LocalShellTaskState
   | LocalAgentTaskState
@@ -460,7 +460,7 @@ export type BackgroundTaskState =
 `isBackgroundTask()` 是类型守卫函数，用于判断任务是否应显示在后台任务指示器：
 
 ```typescript
-// src/tasks/types.ts:37-46
+// src/tasks/types.ts 中的 isBackgroundTask 类型守卫函数
 export function isBackgroundTask(task: TaskState): task is BackgroundTaskState {
   // 状态检查：必须是 running 或 pending
   if (task.status !== 'running' && task.status !== 'pending') {
@@ -761,17 +761,17 @@ flowchart TB
 
 | 引用位置 | 说明 |
 |----------|------|
-| `src/Tool.ts:362-695` | Tool 泛型接口定义 |
-| `src/Tool.ts:158-300` | ToolUseContext 类型定义 |
-| `src/Tool.ts:321-336` | ToolResult 类型定义 |
-| `src/Tool.ts:700-701` | Tools 集合类型定义 |
-| `src/Tool.ts:757-792` | buildTool 工厂函数和默认值 |
-| `src/types/command.ts:205-206` | Command 联合类型定义 |
-| `src/types/command.ts:175-203` | CommandBase 基础类型定义 |
-| `src/types/command.ts:25-57` | PromptCommand 类型定义 |
-| `src/types/command.ts:74-78` | LocalCommand 类型定义 |
-| `src/types/command.ts:144-152` | LocalJSXCommand 类型定义 |
-| `src/types/command.ts:16-23` | LocalCommandResult 类型定义 |
-| `src/tasks/types.ts:12-19` | TaskState 联合类型定义 |
-| `src/tasks/types.ts:22-29` | BackgroundTaskState 类型定义 |
-| `src/tasks/types.ts:37-46` | isBackgroundTask 类型守卫函数 |
+| `src/Tool.ts` | Tool 泛型接口定义 |
+| `src/Tool.ts` | ToolUseContext 类型定义 |
+| `src/Tool.ts` | ToolResult 类型定义 |
+| `src/Tool.ts` | Tools 集合类型定义 |
+| `src/Tool.ts` | buildTool 工厂函数和默认值 |
+| `src/types/command.ts` | Command 联合类型定义 |
+| `src/types/command.ts` | CommandBase 基础类型定义 |
+| `src/types/command.ts` | PromptCommand 类型定义 |
+| `src/types/command.ts` | LocalCommand 类型定义 |
+| `src/types/command.ts` | LocalJSXCommand 类型定义 |
+| `src/types/command.ts` | LocalCommandResult 类型定义 |
+| `src/tasks/types.ts` | TaskState 联合类型定义 |
+| `src/tasks/types.ts` | BackgroundTaskState 类型定义 |
+| `src/tasks/types.ts` | isBackgroundTask 类型守卫函数 |

@@ -52,7 +52,7 @@ graph TB
 ### 36.2.1 类结构与属性
 
 ```typescript
-// focus.ts 第 15-25 行
+// focus.ts
 export class FocusManager {
   activeElement: DOMElement | null = null
   private dispatchFocusEvent: (target: DOMElement, event: FocusEvent) => boolean
@@ -74,7 +74,7 @@ export class FocusManager {
 
 ### 36.2.2 焦点切换流程
 
-`focus()` 方法实现了完整的焦点切换逻辑（第 27-42 行）：
+`focus()` 方法实现了完整的焦点切换逻辑：
 
 ```typescript
 focus(node: DOMElement): void {
@@ -106,7 +106,7 @@ focus(node: DOMElement): void {
 
 ### 36.2.3 Tab 键导航
 
-`focusNext()` 和 `focusPrevious()` 实现 Tab 键导航（第 102-131 行）：
+`focusNext()` 和 `focusPrevious()` 实现 Tab 键导航：
 
 ```typescript
 focusNext(root: DOMElement): void {
@@ -140,7 +140,7 @@ private moveFocus(direction: 1 | -1, root: DOMElement): void {
 }
 ```
 
-`collectTabbable()` 函数遍历 DOM 树，收集所有 `tabIndex >= 0` 的元素（第 134-151 行）：
+`collectTabbable()` 函数遍历 DOM 树，收集所有 `tabIndex >= 0` 的元素：
 
 ```typescript
 function collectTabbable(root: DOMElement): DOMElement[] {
@@ -165,7 +165,7 @@ function walkTree(node: DOMElement, result: DOMElement[]): void {
 
 ### 36.2.4 元素移除时的焦点恢复
 
-当聚焦元素被移除时，系统从栈中恢复焦点（第 57-82 行）：
+当聚焦元素被移除时，系统从栈中恢复焦点：
 
 ```typescript
 handleNodeRemoved(node: DOMElement, root: DOMElement): void {
@@ -198,7 +198,7 @@ handleNodeRemoved(node: DOMElement, root: DOMElement): void {
 
 ### 36.2.5 根节点查找辅助函数
 
-`getRootNode()` 和 `getFocusManager()` 提供从任意节点获取焦点管理器的途径（第 166-181 行）：
+`getRootNode()` 和 `getFocusManager()` 提供从任意节点获取焦点管理器的途径：
 
 ```typescript
 export function getRootNode(node: DOMElement): DOMElement {
@@ -221,7 +221,7 @@ export function getFocusManager(node: DOMElement): FocusManager {
 
 ### 36.3.1 FocusEvent 类定义
 
-`events/focus-event.ts` 定义了焦点事件类（第 1-22 行）：
+`events/focus-event.ts` 定义了焦点事件类：
 
 ```typescript
 import { type EventTarget, TerminalEvent } from './terminal-event.js'
@@ -246,17 +246,17 @@ export class FocusEvent extends TerminalEvent {
 
 ### 36.3.2 事件派发机制
 
-焦点事件通过 `Dispatcher` 的 `dispatchDiscrete()` 方法派发，使用离散优先级（同步执行）：
+焦点事件通过 `Dispatcher` 的 `dispatchDiscrete()` 方法派发：
 
 ```typescript
-// ink.tsx 第 234-235 行
+// ink.tsx
 this.focusManager = new FocusManager((target, event) =>
   dispatcher.dispatchDiscrete(target, event)
 )
 this.rootNode.focusManager = this.focusManager
 ```
 
-事件处理器映射定义在 `event-handlers.ts`（第 44-54 行）：
+事件处理器映射定义在 `event-handlers.ts`：
 
 ```typescript
 export const HANDLER_FOR_EVENT: Record<
@@ -278,7 +278,7 @@ export const HANDLER_FOR_EVENT: Record<
 
 ### 36.4.1 SelectionState 数据结构
 
-`selection.ts` 定义了选择状态（第 19-63 行）：
+`selection.ts` 定义了选择状态：
 
 ```typescript
 export type SelectionState = {
@@ -309,11 +309,11 @@ export type SelectionState = {
 - **anchor**：选择的固定端点（鼠标按下位置）
 - **focus**：选择的活动端点（鼠标当前位置）
 
-渲染时通过 `selectionBounds()` 函数将 anchor/focus 转换为 start/end（第 684-692 行）。
+渲染时通过 `selectionBounds()` 函数将 anchor/focus 转换为 start/end。
 
 ### 36.4.2 选择操作流程
 
-**开始选择**（第 79-98 行）：
+**开始选择**：
 
 ```typescript
 export function startSelection(
@@ -336,7 +336,7 @@ export function startSelection(
 }
 ```
 
-**更新选择**（第 100-114 行）：
+**更新选择**：
 
 ```typescript
 export function updateSelection(
@@ -352,7 +352,7 @@ export function updateSelection(
 }
 ```
 
-**完成选择**（第 116-120 行）：
+**完成选择**：
 
 ```typescript
 export function finishSelection(s: SelectionState): void {
@@ -363,7 +363,7 @@ export function finishSelection(s: SelectionState): void {
 
 ### 36.4.3 智能选择模式
 
-**双击选词**（第 240-254 行）：
+**双击选词**：
 
 ```typescript
 export function selectWordAt(
@@ -383,7 +383,7 @@ export function selectWordAt(
 }
 ```
 
-字符分类函数（第 151-155 行）定义了单词边界：
+字符分类函数定义了单词边界：
 
 ```typescript
 function charClass(c: string): 0 | 1 | 2 {
@@ -393,7 +393,7 @@ function charClass(c: string): 0 | 1 | 2 {
 }
 ```
 
-`WORD_CHAR` 正则（第 142 行）匹配 iTerm2 默认的单词字符集：
+`WORD_CHAR` 正则匹配 iTerm2 默认的单词字符集：
 
 ```typescript
 const WORD_CHAR = /[\p{L}\p{N}_/.\-+~\\]/u
@@ -401,7 +401,7 @@ const WORD_CHAR = /[\p{L}\p{N}_/.\-+~\\]/u
 
 这意味着路径如 `/usr/bin/bash` 或 `~/.claude/config.json` 双击时会完整选中。
 
-**三击选行**（第 368-380 行）：
+**三击选行**：
 
 ```typescript
 export function selectLineAt(
@@ -423,7 +423,7 @@ export function selectLineAt(
 
 当内容滚动时，选择需要跟随文本而非屏幕位置。
 
-**拖拽滚动时锚点移动**（第 573-602 行）：
+**拖拽滚动时锚点移动**：
 
 ```typescript
 export function shiftAnchor(
@@ -440,7 +440,7 @@ export function shiftAnchor(
 }
 ```
 
-**键盘滚动时整体移动**（第 470-565 行）：
+**键盘滚动时整体移动**：
 
 ```typescript
 export function shiftSelection(
@@ -475,7 +475,7 @@ export function shiftSelection(
 
 ### 36.4.5 选择文本提取
 
-`getSelectedText()` 从屏幕缓冲区提取选中文本（第 773-795 行）：
+`getSelectedText()` 从屏幕缓冲区提取选中文本：
 
 ```typescript
 export function getSelectedText(s: SelectionState, screen: Screen): string {
@@ -506,7 +506,7 @@ export function getSelectedText(s: SelectionState, screen: Screen): string {
 }
 ```
 
-`joinRows()` 函数处理软换行（第 750-760 行）：
+`joinRows()` 函数处理软换行：
 
 ```typescript
 function joinRows(
@@ -526,7 +526,7 @@ function joinRows(
 
 ### 36.4.6 选择高亮渲染
 
-`applySelectionOverlay()` 直接修改屏幕缓冲区的样式（第 893-917 行）：
+`applySelectionOverlay()` 直接修改屏幕缓冲区的样式：
 
 ```typescript
 export function applySelectionOverlay(
@@ -565,7 +565,7 @@ export function applySelectionOverlay(
 
 ### 36.5.1 KeyboardEvent 类
 
-`events/keyboard-event.ts` 定义键盘事件（第 12-30 行）：
+`events/keyboard-event.ts` 定义键盘事件：
 
 ```typescript
 export class KeyboardEvent extends TerminalEvent {
@@ -605,7 +605,7 @@ export class KeyboardEvent extends TerminalEvent {
 - **X10/SGR Mouse**：鼠标事件解析
 - **应用键盘模式**：`ESC O letter`（小键盘）
 
-**CSI u 解析**（第 633-652 行）：
+**CSI u 解析**：
 
 ```typescript
 if ((match = CSI_U_RE.exec(s))) {
@@ -627,7 +627,7 @@ if ((match = CSI_U_RE.exec(s))) {
 }
 ```
 
-**修饰键解码**（第 465-478 行）：
+**修饰键解码**：
 
 ```typescript
 function decodeModifier(modifier: number): {
@@ -648,7 +648,7 @@ function decodeModifier(modifier: number): {
 
 ### 36.5.3 InputEvent 与 useInput Hook
 
-`InputEvent` 封装了更丰富的输入信息（`input-event.ts` 第 192-205 行）：
+`InputEvent` 封装了更丰富的输入信息（`input-event.ts`）：
 
 ```typescript
 export class InputEvent extends Event {
@@ -667,7 +667,7 @@ export class InputEvent extends Event {
 }
 ```
 
-`Key` 类型提供语义化的按键检测（第 4-25 行）：
+`Key` 类型提供语义化的按键检测：
 
 ```typescript
 export type Key = {
@@ -694,7 +694,7 @@ export type Key = {
 }
 ```
 
-`useInput` Hook 提供简洁的输入处理接口（`hooks/use-input.ts` 第 42-90 行）：
+`useInput` Hook 提供简洁的输入处理接口（`hooks/use-input.ts`）：
 
 ```typescript
 const useInput = (inputHandler: Handler, options: Options = {}) => {
@@ -731,7 +731,7 @@ const useInput = (inputHandler: Handler, options: Options = {}) => {
 
 ### 36.6.1 hitTest 命中测试
 
-`hit-test.ts` 实现了基于渲染位置的命中测试（第 18-41 行）：
+`hit-test.ts` 实现了基于渲染位置的命中测试：
 
 ```typescript
 export function hitTest(
@@ -768,7 +768,7 @@ export function hitTest(
 
 ### 36.6.2 dispatchClick 事件派发
 
-点击事件从最深层命中元素向上冒泡（第 49-89 行）：
+点击事件从最深层命中元素向上冒泡：
 
 ```typescript
 export function dispatchClick(
@@ -817,7 +817,7 @@ export function dispatchClick(
 
 ### 36.6.3 ClickEvent 类
 
-`click-event.ts` 定义点击事件（第 10-38 行）：
+`click-event.ts` 定义点击事件：
 
 ```typescript
 export class ClickEvent extends Event {
@@ -845,7 +845,7 @@ export class ClickEvent extends Event {
 
 ### 36.6.4 Hover 事件处理
 
-`dispatchHover()` 处理鼠标悬停状态（第 102-130 行）：
+`dispatchHover()` 处理鼠标悬停状态：
 
 ```typescript
 export function dispatchHover(
@@ -892,7 +892,7 @@ export function dispatchHover(
 
 ### 36.7.1 Dispatcher 类结构
 
-`events/dispatcher.ts` 定义分发器（第 161-164 行）：
+`events/dispatcher.ts` 定义分发器：
 
 ```typescript
 export class Dispatcher {
@@ -906,7 +906,7 @@ export class Dispatcher {
 
 ### 36.7.2 监听器收集
 
-`collectListeners()` 按 DOM 顺序收集处理器（第 46-79 行）：
+`collectListeners()` 按 DOM 顺序收集处理器：
 
 ```typescript
 function collectListeners(
@@ -951,7 +951,7 @@ function collectListeners(
 
 ### 36.7.3 优先级映射
 
-事件类型映射到 React 调度优先级（第 122-138 行）：
+事件类型映射到 React 调度优先级：
 
 ```typescript
 function getEventPriority(eventType: string): number {
@@ -977,7 +977,7 @@ function getEventPriority(eventType: string): number {
 
 ### 36.7.4 事件派发执行
 
-`dispatch()` 方法执行完整派发流程（第 185-201 行）：
+`dispatch()` 方法执行完整派发流程：
 
 ```typescript
 dispatch(target: EventTarget, event: TerminalEvent): boolean {
@@ -999,7 +999,7 @@ dispatch(target: EventTarget, event: TerminalEvent): boolean {
 }
 ```
 
-`processDispatchQueue()` 执行监听器队列，处理传播停止（第 87-114 行）：
+`processDispatchQueue()` 执行监听器队列，处理传播停止：
 
 ```typescript
 function processDispatchQueue(
@@ -1033,7 +1033,7 @@ function processDispatchQueue(
 
 ### 36.8.1 组件结构
 
-`components/Button.tsx` 定义按钮组件（第 39-186 行）：
+`components/Button.tsx` 定义按钮组件：
 
 ```typescript
 function Button({
@@ -1156,7 +1156,7 @@ export type Props = Except<Styles, 'textWrap'> & {
 
 ### 36.9.1 TerminalFocusState 类型
 
-`terminal-focus-state.ts` 定义状态（第 1-11 行）：
+`terminal-focus-state.ts` 定义状态：
 
 ```typescript
 export type TerminalFocusState = 'focused' | 'blurred' | 'unknown'
@@ -1194,7 +1194,7 @@ export function subscribeTerminalFocus(cb: () => void): () => void {
 
 ### 36.9.3 TerminalFocusProvider
 
-`TerminalFocusContext.tsx` 提供 React Context（第 20-50 行）：
+`TerminalFocusContext.tsx` 提供 React Context：
 
 ```typescript
 export function TerminalFocusProvider({

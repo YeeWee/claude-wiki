@@ -129,7 +129,7 @@ flowchart TB
 配置文件使用 JSON Schema 验证，核心字段定义如下：
 
 ```typescript
-// src/utils/settings/types.ts:255-700
+// src/utils/settings/types.ts 中的 SettingsSchema 定义
 export const SettingsSchema = lazySchema(() =>
   z.object({
     // JSON Schema 引用
@@ -243,7 +243,7 @@ export const SettingsSchema = lazySchema(() =>
 配置加载发生在启动初始化阶段，核心函数位于 `src/utils/settings/settings.ts`：
 
 ```typescript
-// src/utils/settings/settings.ts:645-796
+// src/utils/settings/settings.ts 中的配置加载函数
 function loadSettingsFromDisk(): SettingsWithErrors {
   // 防止递归调用
   if (isLoadingSettings) {
@@ -293,7 +293,7 @@ function loadSettingsFromDisk(): SettingsWithErrors {
 配置合并使用 lodash 的 `mergeWith` 函数，配合自定义合并器：
 
 ```typescript
-// src/utils/settings/settings.ts:538-547
+// src/utils/settings/settings.ts 中的合并自定义器
 export function settingsMergeCustomizer(
   objValue: unknown,
   srcValue: unknown,
@@ -325,7 +325,7 @@ function mergeArrays<T>(targetArray: T[], sourceArray: T[]): T[] {
 Policy Settings（企业策略配置）采用 **"首个来源优先"（First Source Wins）** 策略：
 
 ```typescript
-// src/utils/settings/settings.ts:375-407
+// src/utils/settings/settings.ts 中的策略来源获取函数
 export function getPolicySettingsOrigin(): 'remote' | 'plist' | 'hklm' | 'file' | 'hkcu' | null {
   // 1. Remote API（最高优先级）
   const remoteSettings = getRemoteManagedSettingsSyncFromCache()
@@ -362,7 +362,7 @@ export function getPolicySettingsOrigin(): 'remote' | 'plist' | 'hklm' | 'file' 
 为避免重复文件 I/O，配置系统使用多级缓存：
 
 ```typescript
-// src/utils/settings/settingsCache.ts
+// src/utils/settings/settingsCache.ts 中的缓存结构
 // 会话级缓存：合并后的最终配置
 let sessionSettingsCache: SettingsWithErrors | null = null
 
@@ -402,7 +402,7 @@ export function resetSettingsCache(): void {
 环境变量按安全等级分为两类处理：
 
 ```typescript
-// src/utils/managedEnvConstants.ts:108-191
+// src/utils/managedEnvConstants.ts 中的安全环境变量定义
 export const SAFE_ENV_VARS = new Set([
   'ANTHROPIC_CUSTOM_HEADERS',
   'ANTHROPIC_MODEL',
@@ -427,7 +427,7 @@ export const SAFE_ENV_VARS = new Set([
 ### 4.5.3 环境变量应用流程
 
 ```typescript
-// src/utils/managedEnv.ts:124-178
+// src/utils/managedEnv.ts 中的环境变量应用函数
 export function applySafeConfigEnvironmentVariables(): void {
   // 1. 应用全局配置的环境变量
   Object.assign(process.env, filterSettingsEnv(getGlobalConfig().env))
@@ -468,7 +468,7 @@ export function applyConfigEnvironmentVariables(): void {
 当宿主进程设置 `CLAUDE_CODE_PROVIDER_MANAGED_BY_HOST` 时，配置系统会剥离提供商路由相关的环境变量：
 
 ```typescript
-// src/utils/managedEnv.ts:45-59
+// src/utils/managedEnv.ts 中的 Host-Managed Provider 处理
 function withoutHostManagedProviderVars(env: Record<string, string> | undefined): Record<string, string> {
   if (!isEnvTruthy(process.env.CLAUDE_CODE_PROVIDER_MANAGED_BY_HOST)) {
     return env
@@ -494,7 +494,7 @@ function withoutHostManagedProviderVars(env: Record<string, string> | undefined)
 配置文件解析时进行 Zod Schema 验证：
 
 ```typescript
-// src/utils/settings/settings.ts:201-230
+// src/utils/settings/settings.ts 中的配置文件解析函数
 function parseSettingsFileUncached(path: string): {
   settings: SettingsJson | null
   errors: ValidationError[]
@@ -529,7 +529,7 @@ function parseSettingsFileUncached(path: string): {
 Settings Schema 设计遵循向后兼容原则：
 
 ```typescript
-// src/utils/settings/types.ts:211-241
+// src/utils/settings/types.ts 中的向后兼容注释
 /**
  * ⚠️ BACKWARD COMPATIBILITY NOTICE ⚠️
  *
@@ -552,7 +552,7 @@ Settings Schema 设计遵循向后兼容原则：
 验证失败时，无效字段保留在文件中，用户可手动修复：
 
 ```typescript
-// src/utils/settings/settings.ts:443-471
+// src/utils/settings/settings.ts 中的验证失败处理
 // 如果验证失败但文件存在 JSON 语法错误
 // 返回验证错误而不是覆盖文件
 if (content !== null) {
@@ -576,7 +576,7 @@ if (content !== null) {
 配置写入通过统一函数处理：
 
 ```typescript
-// src/utils/settings/settings.ts:416-524
+// src/utils/settings/settings.ts 中的配置更新函数
 export function updateSettingsForSource(
   source: EditableSettingSource,
   settings: SettingsJson,
@@ -663,7 +663,7 @@ updateSettingsForSource('userSettings', {
 配置加载在 `init.ts` 中按特定顺序执行：
 
 ```typescript
-// src/entrypoints/init.ts:63-84
+// src/entrypoints/init.ts 中的初始化序列
 export const init = memoize(async (): Promise<void> => {
   // 1. 启用配置系统
   enableConfigs()

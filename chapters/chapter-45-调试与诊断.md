@@ -1,5 +1,7 @@
 # 第四十五章：调试与诊断
 
+> 本章基于 Claude Code 源代码分析，请以最新版本为准。
+
 > 调试与诊断工具是开发者的"健康体检系统"。Claude Code 提供了完整的诊断机制，从 `/doctor` 命令到多层次的日志系统，帮助开发者快速定位和解决问题。本章将深入分析调试工具的设计与实现。
 
 ---
@@ -76,7 +78,7 @@ flowchart TB
 
 ### 45.2.1 命令注册与启用
 
-`/doctor` 命令是 Claude Code 的诊断入口，定义在 `src/commands/doctor/index.ts:4-12`：
+`/doctor` 命令是 Claude Code 的诊断入口，定义在 `src/commands/doctor/index.ts`（命令注册区域）：
 
 ```typescript
 const doctor: Command = {
@@ -118,7 +120,7 @@ const [versionLockInfo, setVersionLockInfo] = useState<VersionLockInfo | null>(n
 
 ### 45.2.3 诊断信息收集
 
-诊断信息由 `getDoctorDiagnostic()` 函数收集，定义在 `src/utils/doctorDiagnostic.ts:514-625`：
+诊断信息由 `getDoctorDiagnostic()` 函数收集，定义在 `src/utils/doctorDiagnostic.ts`（诊断信息收集区域）：
 
 ```typescript
 export async function getDoctorDiagnostic(): Promise<DiagnosticInfo> {
@@ -205,7 +207,7 @@ export async function getCurrentInstallationType(): Promise<InstallationType> {
 
 ### 45.3.1 上下文警告类型
 
-`checkContextWarnings()` 函数检测可能导致上下文过载的配置问题，定义在 `src/utils/doctorContextWarnings.ts:246-265`：
+`checkContextWarnings()` 函数检测可能导致上下文过载的配置问题，定义在 `src/utils/doctorContextWarnings.ts`（上下文警告类型区域）：
 
 ```typescript
 export type ContextWarnings = {
@@ -842,15 +844,15 @@ Claude Code 的调试与诊断系统提供了完整的开发者支持：
 
 | 功能 | 源码位置 |
 |-----|---------|
-| Doctor 命令注册 | `src/commands/doctor/index.ts:4-12` |
-| Doctor 屏幕组件 | `src/screens/Doctor.tsx:100-502` |
-| 诊断信息收集 | `src/utils/doctorDiagnostic.ts:514-625` |
-| 安装类型检测 | `src/utils/doctorDiagnostic.ts:86-148` |
-| 上下文警告检测 | `src/utils/doctorContextWarnings.ts:246-265` |
-| 调试日志系统 | `src/utils/debug.ts:18-269` |
-| 调试过滤器 | `src/utils/debugFilter.ts:16-157` |
-| 错误日志系统 | `src/utils/log.ts:64-363` |
-| 错误日志 Sink | `src/utils/errorLogSink.ts:22-236` |
-| Debug 技能 | `src/skills/bundled/debug.ts:12-103` |
-| API 日志 | `src/services/api/logging.ts:171-789` |
-| 无 PII 诊断日志 | `src/utils/diagLogs.ts:26-95` |
+| Doctor 命令注册 | `src/commands/doctor/index.ts` |
+| Doctor 屏幕组件 | `src/screens/Doctor.tsx` |
+| 诊断信息收集 | `src/utils/doctorDiagnostic.ts` |
+| 安装类型检测 | `src/utils/doctorDiagnostic.ts` |
+| 上下文警告检测 | `src/utils/doctorContextWarnings.ts` |
+| 调试日志系统 | `src/utils/debug.ts` |
+| 调试过滤器 | `src/utils/debugFilter.ts` |
+| 错误日志系统 | `src/utils/log.ts` |
+| 错误日志 Sink | `src/utils/errorLogSink.ts` |
+| Debug 技能 | `src/skills/bundled/debug.ts` |
+| API 日志 | `src/services/api/logging.ts` |
+| 无 PII 诊断日志 | `src/utils/diagLogs.ts` |

@@ -78,7 +78,7 @@ graph TB
 
 ### 34.2.1 SandboxManager 架构
 
-`SandboxManager` 是沙箱系统的核心接口，定义在 `src/utils/sandbox/sandbox-adapter.ts:927-967`，它封装了底层 sandbox-runtime 包的功能，并添加了 Claude Code 特有的配置转换和状态管理：
+`SandboxManager` 是沙箱系统的核心接口，定义在 `src/utils/sandbox/sandbox-adapter.ts`，它封装了底层 sandbox-runtime 包的功能：
 
 ```typescript
 export interface ISandboxManager {
@@ -108,7 +108,7 @@ export const SandboxManager: ISandboxManager = {
 
 ### 34.2.2 初始化流程
 
-沙箱初始化发生在应用启动阶段，位于 `src/utils/sandbox/sandbox-adapter.ts:730-792`：
+沙箱初始化发生在应用启动阶段，位于 `src/utils/sandbox/sandbox-adapter.ts` 的 `initialize` 函数：
 
 ```typescript
 async function initialize(sandboxAskCallback?: SandboxAskCallback): Promise<void> {
@@ -159,15 +159,15 @@ async function initialize(sandboxAskCallback?: SandboxAskCallback): Promise<void
 
 关键设计要点：
 
-1. **Promise 防重入**：使用 `initializationPromise` 防止并发初始化（第738行）
+1. **Promise 防重入**：使用 `initializationPromise` 防止并发初始化
 
-2. **Worktree 检测**：Git worktree 需要访问主仓库目录，必须预先解析（第765行）
+2. **Worktree 检测**：Git worktree 需要访问主仓库目录，必须预先解析
 
-3. **动态配置更新**：订阅设置变更事件，实时更新沙箱策略（第776行）
+3. **动态配置更新**：订阅设置变更事件，实时更新沙箱策略
 
 ### 34.2.3 沙箱启用判断
 
-`shouldUseSandbox` 函数决定了特定命令是否需要沙箱包装，定义在 `src/tools/BashTool/shouldUseSandbox.ts:130-153`：
+`shouldUseSandbox` 函数决定了特定命令是否需要沙箱包装，定义在 `src/tools/BashTool/shouldUseSandbox.ts`：
 
 ```typescript
 export function shouldUseSandbox(input: Partial<SandboxInput>): boolean {
@@ -198,7 +198,7 @@ export function shouldUseSandbox(input: Partial<SandboxInput>): boolean {
 
 ### 34.2.4 平台支持检测
 
-沙箱依赖操作系统特定的隔离机制，平台检测逻辑位于 `src/utils/sandbox/sandbox-adapter.ts:491-546`：
+沙箱依赖操作系统特定的隔离机制，平台检测逻辑位于 `src/utils/sandbox/sandbox-adapter.ts`：
 
 ```typescript
 // 支持的平台：macOS、Linux、WSL2（WSL1 不支持）
@@ -228,7 +228,7 @@ function isSandboxingEnabled(): boolean {
 
 ### 34.3.1 文件访问控制配置
 
-沙箱对文件系统的访问控制分为读取和写入两个维度，配置定义在 `src/entrypoints/sandboxTypes.ts:47-86`：
+沙箱对文件系统的访问控制分为读取和写入两个维度，配置定义在 `src/entrypoints/sandboxTypes.ts`：
 
 ```typescript
 export const SandboxFilesystemConfigSchema = lazySchema(() =>
@@ -249,7 +249,7 @@ export const SandboxFilesystemConfigSchema = lazySchema(() =>
 
 ### 34.3.2 路径解析安全
 
-路径解析是文件系统安全的关键环节，需要正确处理各种路径格式，定义在 `src/utils/sandbox/sandbox-adapter.ts:99-146`：
+路径解析是文件系统安全的关键环节，需要正确处理各种路径格式，定义在 `src/utils/sandbox/sandbox-adapter.ts` 的 `resolvePathPatternForSandbox` 函数：
 
 ```typescript
 /**
@@ -280,7 +280,7 @@ export function resolvePathPatternForSandbox(
 
 ### 34.3.3 关键文件保护
 
-沙箱配置构建时，会自动添加对敏感文件的保护，位于 `src/utils/sandbox/sandbox-adapter.ts:229-281`：
+沙箱配置构建时，会自动添加对敏感文件的保护，位于 `src/utils/sandbox/sandbox-adapter.ts` 的配置构建部分：
 
 ```typescript
 // 构建文件系统访问配置
@@ -329,7 +329,7 @@ for (const dir of cwd === originalCwd ? [originalCwd] : [originalCwd, cwd]) {
 
 ### 34.3.4 裸 Git 仓库攻击清理
 
-`scrubBareGitRepoFiles` 函数负责清理可能被恶意植入的 Git 仓库文件，定义在 `src/utils/sandbox/sandbox-adapter.ts:404-414`：
+`scrubBareGitRepoFiles` 函数负责清理可能被恶意植入的 Git 仓库文件，定义在 `src/utils/sandbox/sandbox-adapter.ts`：
 
 ```typescript
 /**
@@ -353,7 +353,7 @@ function scrubBareGitRepoFiles(): void {
 
 ### 34.3.5 危险文件列表
 
-应用层还定义了需要特殊保护的文件和目录列表，位于 `src/utils/permissions/filesystem.ts:57-79`：
+应用层还定义了需要特殊保护的文件和目录列表，位于 `src/utils/permissions/filesystem.ts`：
 
 ```typescript
 /**
@@ -391,7 +391,7 @@ export const DANGEROUS_DIRECTORIES = [
 
 ### 34.4.1 危险命令模式检测
 
-危险命令模式列表定义在 `src/utils/permissions/dangerousPatterns.ts:44-80`：
+危险命令模式列表定义在 `src/utils/permissions/dangerousPatterns.ts`：
 
 ```typescript
 export const DANGEROUS_BASH_PATTERNS: readonly string[] = [
@@ -434,7 +434,7 @@ export const CROSS_PLATFORM_CODE_EXEC = [
 
 ### 34.4.2 命令排除机制
 
-用户可以通过设置排除特定命令，使其不经过沙箱执行，定义在 `src/tools/BashTool/shouldUseSandbox.ts:21-128`：
+用户可以通过设置排除特定命令，使其不经过沙箱执行，定义在 `src/tools/BashTool/shouldUseSandbox.ts` 的 `containsExcludedCommand` 函数：
 
 ```typescript
 function containsExcludedCommand(command: string): boolean {
@@ -528,7 +528,7 @@ function containsExcludedCommand(command: string): boolean {
 
 ### 34.4.3 命令安全解析
 
-Bash 命令的 AST 解析提供了更深层次的安全检查，定义在 `src/utils/bash/ast.ts:1-200`：
+Bash 命令的 AST 解析提供了更深层次的安全检查，定义在 `src/utils/bash/ast.ts`：
 
 ```typescript
 /**
@@ -581,7 +581,7 @@ const SAFE_ENV_VARS = new Set([
 
 ### 34.4.4 沙箱命令包装
 
-最终执行命令前，需要通过 `wrapWithSandbox` 包装，定义在 `src/utils/sandbox/sandbox-adapter.ts:704-725`：
+最终执行命令前，需要通过 `wrapWithSandbox` 包装，定义在 `src/utils/sandbox/sandbox-adapter.ts`：
 
 ```typescript
 async function wrapWithSandbox(
@@ -674,7 +674,7 @@ graph LR
 
 ### 34.5.3 配置优先级与策略锁定
 
-沙箱设置支持多来源配置，但策略设置具有最高优先级，定义在 `src/utils/sandbox/sandbox-adapter.ts:647-664`：
+沙箱设置支持多来源配置，但策略设置具有最高优先级，定义在 `src/utils/sandbox/sandbox-adapter.ts` 的 `areSandboxSettingsLockedByPolicy` 函数：
 
 ```typescript
 function areSandboxSettingsLockedByPolicy(): boolean {
@@ -698,7 +698,7 @@ function areSandboxSettingsLockedByPolicy(): boolean {
 
 ### 34.5.4 网络隔离策略
 
-网络访问控制是防止数据泄露的关键防线，配置定义在 `src/entrypoints/sandboxTypes.ts:14-42`：
+网络访问控制是防止数据泄露的关键防线，配置定义在 `src/entrypoints/sandboxTypes.ts`：
 
 ```typescript
 export const SandboxNetworkConfigSchema = lazySchema(() =>
@@ -730,7 +730,7 @@ export function shouldAllowManagedSandboxDomainsOnly(): boolean {
 
 ### 34.5.5 安全设置接口
 
-用户可通过 `/sandbox` 命令管理沙箱设置，实现位于 `src/commands/sandbox-toggle/sandbox-toggle.tsx:10-82`：
+用户可通过 `/sandbox` 命令管理沙箱设置，实现位于 `src/commands/sandbox-toggle/sandbox-toggle.tsx`：
 
 ```typescript
 export async function call(onDone, _context, args?: string): Promise<React.ReactNode | null> {

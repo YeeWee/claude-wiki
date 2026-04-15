@@ -38,7 +38,7 @@ src/services/api/
 
 `claude.ts` 是 API 客户端的核心文件，包含以下主要组件：
 
-| 组件 | 行号范围 | 功能 |
+| 组件 | 功能 |
 |------|----------|------|
 | 类型导入 | 1-258 | 导入 SDK 类型、工具类型、消息类型 |
 | 配置函数 | 272-500 | `getExtraBodyParams`、`getPromptCachingEnabled`、`configureEffortParams` |
@@ -176,7 +176,7 @@ sequenceDiagram
 
 ### 24.4.1 getAnthropicClient() 函数
 
-定义在 `client.ts:88-316`，负责创建 Anthropic SDK 客户端：
+定义在 `src/services/api/client.ts`，负责创建 Anthropic SDK 客户端：
 
 ```typescript
 export async function getAnthropicClient({
@@ -243,7 +243,7 @@ OAuth 用户使用 `authToken`（访问令牌），API Key 用户使用 `Authori
 
 ### 24.5.1 withRetry() 函数
 
-定义在 `withRetry.ts:170-450`，实现智能重试策略：
+定义在 `src/services/api/withRetry.ts`，实现智能重试策略：
 
 ```typescript
 export async function* withRetry<T>(
@@ -449,7 +449,7 @@ if (streamingError) {
 
 ### 24.7.1 Usage 类型
 
-定义在 `logging.ts:6-11`：
+定义在 `src/services/api/logging.ts`：
 
 ```typescript
 export type NonNullableUsage = {
@@ -474,7 +474,7 @@ export type NonNullableUsage = {
 
 ### 24.7.2 updateUsage() 函数
 
-定义在 `claude.ts:2924-2987`，累积流式事件中的 usage：
+定义在 `src/services/api/claude.ts`，累积流式事件中的 usage：
 
 ```typescript
 export function updateUsage(
@@ -509,7 +509,7 @@ costUSD += addToTotalSessionCost(costUSD, usage, options.model)
 
 ### 24.7.4 Token 记录与分析
 
-**logAPISuccess()** 函数（`logging.ts:398-530`）记录完整的 token 信息：
+**logAPISuccess()** 函数（`src/services/api/logging.ts`）记录完整的 token 信息：
 
 ```typescript
 logEvent('tengu_api_success', {

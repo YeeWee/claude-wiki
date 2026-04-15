@@ -93,7 +93,7 @@ Bun 是 Claude Code 的运行时和打包工具。选择 Bun 的核心原因：
 - **内置打包器**：`bun:bundle` 提供构建时 feature flag，实现死代码消除（DCE）
 - **原生 TypeScript**：无需额外编译配置，直接运行 `.ts`/`.tsx` 文件
 
-关键代码示例（`src/entrypoints/cli.tsx:1`）：
+关键代码示例（在 `src/entrypoints/cli.tsx` 的快速路径检测部分）：
 
 ```typescript
 import { feature } from 'bun:bundle';
@@ -348,7 +348,7 @@ sequenceDiagram
 CLI 工具的启动速度至关重要。Claude Code 通过快速路径（Fast Path）设计，将部分操作延迟加载：
 
 ```typescript
-// src/entrypoints/cli.tsx:36-42
+// src/entrypoints/cli.tsx 中的 --version 快速路径处理
 // --version 快速路径：零模块加载
 if (args.length === 1 && args[0] === '--version') {
   // MACRO.VERSION 在构建时内联
@@ -378,11 +378,11 @@ if (args.length === 1 && args[0] === '--version') {
 
 | 引用位置 | 说明 |
 |----------|------|
-| `src/entrypoints/cli.tsx:1` | `bun:bundle` feature 导入 |
-| `src/entrypoints/cli.tsx:36-42` | --version 快速路径 |
-| `src/entrypoints/cli.tsx:53` | --dump-system-prompt 快速路径 |
-| `src/entrypoints/init.ts:57` | init() 函数入口 |
-| `src/main.tsx:1` | 主应用模块入口 |
+| `src/entrypoints/cli.tsx` | `bun:bundle` feature 导入与快速路径检测 |
+| `src/entrypoints/cli.tsx` | --version 快速路径实现 |
+| `src/entrypoints/cli.tsx` | --dump-system-prompt 快速路径（ant-only） |
+| `src/entrypoints/init.ts` | init() 函数入口 |
+| `src/main.tsx` | 主应用模块入口 |
 | `src/components/App.tsx` | 主应用组件 |
 | `src/Tool.ts` | Tool 核心定义 |
 | `src/QueryEngine.ts` | 消息处理引擎 |

@@ -140,7 +140,7 @@ src/components/
 **文件位置**: `src/components/Message.tsx`
 
 ```typescript
-// 消息类型定义
+// 消息类型定义（注：组件源码为 TypeScript）
 type Props = {
   message: NormalizedUserMessage | AssistantMessage | 
            AttachmentMessage | SystemMessage | 
@@ -195,10 +195,10 @@ function MessageImpl({ message, ... }: Props) {
 
 Assistant 消息的内容块根据类型进一步细分：
 
-**文件位置**: `src/components/Message.tsx:82-156`
+**文件位置**: `src/components/Message.tsx`
 
 ```typescript
-// Assistant 消息内容块渲染
+// Assistant 消息内容块渲染（组件源码为 TypeScript）
 function AssistantMessageBlock({ param, ... }) {
   switch (param.type) {
     case "text":
@@ -217,7 +217,7 @@ function AssistantMessageBlock({ param, ... }) {
 
 `UserTextMessage` 组件处理用户文本消息，根据消息内容特征分发到专用组件。
 
-**文件位置**: `src/components/messages/UserTextMessage.tsx`
+**文件位置**: `src/components/messages/UserTextMessage.tsx`（注：messages 子目录已确认存在）
 
 ```typescript
 export function UserTextMessage({ param, ... }: Props) {
@@ -257,7 +257,7 @@ export function UserTextMessage({ param, ... }: Props) {
 
 `AssistantToolUseMessage` 负责渲染工具调用消息，包括工具名称、参数、进度和结果。
 
-**文件位置**: `src/components/messages/AssistantToolUseMessage.tsx`
+**文件位置**: `src/components/messages/AssistantToolUseMessage.tsx`（注：组件源码为 TypeScript）
 
 ```typescript
 type Props = {
@@ -318,7 +318,7 @@ export function AssistantToolUseMessage({ param, ... }: Props) {
 
 `ToolUseLoader` 是工具执行时的加载指示器，使用闪烁动画表示活动状态。
 
-**文件位置**: `src/components/ToolUseLoader.tsx`
+**文件位置**: `src/components/ToolUseLoader.tsx`（注：组件源码为 TypeScript）
 
 ```typescript
 type Props = {
@@ -354,7 +354,7 @@ export function ToolUseLoader({ isError, isUnresolved, shouldAnimate }: Props) {
 
 权限请求组件位于 `permissions/` 目录，处理工具执行前的用户授权。
 
-**目录结构**: `src/components/permissions/`
+**目录结构**: `src/components/permissions/`（注：权限请求组件源码为 TypeScript）
 
 ```
 permissions/
@@ -394,7 +394,7 @@ sequenceDiagram
 
 `StatusLine` 是终端底部状态栏组件，显示会话状态、模型信息、成本统计等。
 
-**文件位置**: `src/components/StatusLine.tsx`
+**文件位置**: `src/components/StatusLine.tsx`（注：组件源码为 TypeScript）
 
 ```typescript
 type Props = {
@@ -451,7 +451,7 @@ function StatusLineInner({ messagesRef, lastAssistantMessageId, vimMode }: Props
 
 `AgentProgressLine` 显示 Agent 执行进度，包括工具调用计数和 token 使用。
 
-**文件位置**: `src/components/AgentProgressLine.tsx`
+**文件位置**: `src/components/AgentProgressLine.tsx`（注：组件源码为 TypeScript）
 
 ```typescript
 type Props = {
@@ -534,7 +534,7 @@ Spinner 支持以下动画类型：
 
 `ThemeProvider` 提供主题上下文，支持 dark/light/auto 三种主题模式。
 
-**文件位置**: `src/components/design-system/ThemeProvider.tsx`
+**文件位置**: `src/components/design-system/ThemeProvider.tsx`（注：设计系统组件源码为 TypeScript）
 
 ```typescript
 type ThemeContextValue = {
@@ -613,7 +613,7 @@ export function useTheme(): [ThemeName, (setting: ThemeSetting) => void] {
 
 `App.tsx` 是顶层包装组件，提供全局 Context Provider。
 
-**文件位置**: `src/components/App.tsx`
+**文件位置**: `src/components/App.tsx`（注：顶层组件源码为 TypeScript）
 
 ```typescript
 type Props = {
@@ -692,7 +692,7 @@ graph LR
 3. **Memo 缓存**: 组件结果缓存避免重复计算
 4. **Ref 持久化**: 状态数据通过 Ref 保持稳定引用
 
-**编译缓存示例** (来自 `Message.tsx:59-80`):
+**编译缓存示例**（来自 `Message.tsx`）：
 
 ```typescript
 function MessageImpl(t0) {

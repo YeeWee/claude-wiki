@@ -84,7 +84,7 @@ classDiagram
 用户消息表示来自用户输入的内容。其核心结构定义如下：
 
 ```typescript
-// src/utils/messages.ts 第 502-523 行
+// src/utils/messages.ts（注：消息处理模块源码为 TypeScript）
 const m: UserMessage = {
   type: 'user',
   message: {
@@ -122,7 +122,7 @@ const m: UserMessage = {
 助手消息表示 AI 的响应内容，包含模型返回的各种内容块：
 
 ```typescript
-// src/utils/messages.ts 第 386-409 行
+// src/utils/messages.ts
 function baseCreateAssistantMessage({
   content,
   isApiErrorMessage = false,
@@ -170,7 +170,7 @@ function baseCreateAssistantMessage({
 附件消息用于承载各种类型的附加信息，如文件内容、记忆、hook 结果等：
 
 ```typescript
-// src/utils/attachments.ts 第 440-539 行
+// src/utils/attachments.ts（注：附件类型定义源码为 TypeScript）
 export type Attachment =
   | FileAttachment              // 用户 @-mention 的文件
   | CompactFileReferenceAttachment  // 压缩后的文件引用
@@ -201,7 +201,7 @@ type AttachmentMessage<T extends Attachment = Attachment> = {
 进度消息用于跟踪工具执行的进度状态：
 
 ```typescript
-// src/utils/messages.ts 第 603-620 行
+// src/utils/messages.ts
 export function createProgressMessage<P extends Progress>({
   toolUseID,
   parentToolUseID,
@@ -229,7 +229,7 @@ export function createProgressMessage<P extends Progress>({
 系统消息用于显示各种系统级别的信息，包含多种子类型：
 
 ```typescript
-// src/utils/messages.ts 第 4335-4352 行
+// src/utils/messages.ts
 export function createSystemMessage(
   content: string,
   level: SystemMessageLevel,
@@ -283,7 +283,7 @@ type ContentBlock =
 文本块是最基本的内容类型：
 
 ```typescript
-// src/utils/messages.ts 第 2893-2901 行
+// src/utils/messages.ts
 export function extractTextContent(
   blocks: readonly { readonly type: string }[],
   separator = '',
@@ -300,7 +300,7 @@ export function extractTextContent(
 工具调用块表示 AI 请求执行工具：
 
 ```typescript
-// src/utils/messages.ts 第 825-837 行
+// src/utils/messages.ts
 type ToolUseRequestMessage = NormalizedAssistantMessage & {
   message: { content: [ToolUseBlock] }
 }
@@ -320,7 +320,7 @@ export function isToolUseRequestMessage(
 工具结果块是用户消息中承载工具执行结果的特殊内容：
 
 ```typescript
-// src/utils/messages.ts 第 839-852 行
+// src/utils/messages.ts
 type ToolUseResultMessage = NormalizedUserMessage & {
   message: { content: [ToolResultBlockParam] }
 }
@@ -340,7 +340,7 @@ export function isToolUseResultMessage(
 区分人类输入和工具结果的判断逻辑：
 
 ```typescript
-// src/utils/messagePredicates.ts 第 1-8 行
+// src/utils/messagePredicates.ts
 export function isHumanTurn(m: Message): m is UserMessage {
   return m.type === 'user' && !m.isMeta && m.toolUseResult === undefined
 }
@@ -350,13 +350,13 @@ export function isHumanTurn(m: Message): m is UserMessage {
 
 ### 39.4.1 附件消息创建
 
-附件消息通过 `AttachmentMessage` 类型包装各种附件数据。附件类型定义在 `src/utils/attachments.ts` 文件中。
+附件消息通过 `AttachmentMessage` 类型包装各种附件数据。附件类型定义在 `src/utils/attachments.ts` 文件中（注：源码为 TypeScript）。
 
 常见的附件类型包括：
 
 **文件附件**：
 ```typescript
-// src/utils/attachments.ts 第 295-305 行
+// src/utils/attachments.ts
 export type FileAttachment = {
   type: 'file'
   filename: string
@@ -368,7 +368,7 @@ export type FileAttachment = {
 
 **Hook 附件**：
 ```typescript
-// src/utils/attachments.ts 第 352-380 行
+// src/utils/attachments.ts
 export type HookAttachment =
   | HookCancelledAttachment
   | { type: 'hook_blocking_error' ... }
@@ -383,7 +383,7 @@ export type HookAttachment =
 附件消息在发送到 API 前需要转换为用户消息：
 
 ```typescript
-// src/utils/messages.ts 第 2269-2290 行
+// src/utils/messages.ts
 case 'attachment': {
   const rawAttachmentMessage = normalizeAttachmentForAPI(
     message.attachment,
@@ -407,7 +407,7 @@ case 'attachment': {
 Hook 附件是特殊的附件类型，用于承载 Hook 执行的结果：
 
 ```typescript
-// src/utils/messages.ts 第 1028-1042 行
+// src/utils/messages.ts
 function isHookAttachmentMessage(
   message: Message,
 ): message is AttachmentMessage<HookAttachment> {
@@ -432,7 +432,7 @@ function isHookAttachmentMessage(
 进度消息用于实时显示工具执行状态：
 
 ```typescript
-// src/utils/messages.ts 第 603-620 行
+// src/utils/messages.ts
 export function createProgressMessage<P extends Progress>({
   toolUseID,
   parentToolUseID,
@@ -454,7 +454,7 @@ export function createProgressMessage<P extends Progress>({
 系统提供了预构建的查找表来高效访问进度消息：
 
 ```typescript
-// src/utils/messages.ts 第 1146-1161 行
+// src/utils/messages.ts
 export type MessageLookups = {
   siblingToolUseIDs: Map<string, Set<string>>
   progressMessagesByToolUseID: Map<string, ProgressMessage[]>
@@ -473,7 +473,7 @@ export type MessageLookups = {
 Hook 进度消息用于跟踪 Hook 的执行状态：
 
 ```typescript
-// src/utils/messages.ts 第 1044-1057 行
+// src/utils/messages.ts
 function getInProgressHookCount(
   messages: NormalizedMessage[],
   toolUseID: string,
@@ -497,7 +497,7 @@ function getInProgressHookCount(
 `normalizeMessages` 函数将多内容块的消息拆分为单内容块的消息：
 
 ```typescript
-// src/utils/messages.ts 第 730-823 行
+// src/utils/messages.ts
 export function normalizeMessages(messages: Message[]): NormalizedMessage[] {
   let isNewChain = false
   return messages.flatMap(message => {
@@ -533,7 +533,7 @@ export function normalizeMessages(messages: Message[]): NormalizedMessage[] {
 `normalizeMessagesForAPI` 函数处理消息以符合 API 约束：
 
 ```typescript
-// src/utils/messages.ts 第 1989-2370 行
+// src/utils/messages.ts
 export function normalizeMessagesForAPI(
   messages: Message[],
   tools: Tools = [],
@@ -564,7 +564,7 @@ export function normalizeMessagesForAPI(
 连续的用户消息需要合并以符合 API 约束：
 
 ```typescript
-// src/utils/messages.ts 第 2411-2449 行
+// src/utils/messages.ts
 export function mergeUserMessages(a: UserMessage, b: UserMessage): UserMessage {
   const lastContent = normalizeUserTextContent(a.message.content)
   const currentContent = normalizeUserTextContent(b.message.content)
@@ -584,7 +584,7 @@ export function mergeUserMessages(a: UserMessage, b: UserMessage): UserMessage {
 `hoistToolResults` 函数确保 tool_result 块位于内容数组开头：
 
 ```typescript
-// src/utils/messages.ts 第 2466-2483 行
+// src/utils/messages.ts
 function hoistToolResults(content: ContentBlockParam[]): ContentBlockParam[] {
   const toolResults: ContentBlockParam[] = []
   const otherBlocks: ContentBlockParam[] = []
@@ -608,7 +608,7 @@ function hoistToolResults(content: ContentBlockParam[]): ContentBlockParam[] {
 `buildMessageLookups` 函数构建高效的查找表：
 
 ```typescript
-// src/utils/messages.ts 第 1170-1340 行
+// src/utils/messages.ts
 export function buildMessageLookups(
   normalizedMessages: NormalizedMessage[],
   messages: Message[],
@@ -641,7 +641,7 @@ export function buildMessageLookups(
 基于预构建的查找表，系统提供了 O(1) 复杂度的查询函数：
 
 ```typescript
-// src/utils/messages.ts 第 1421-1444 行
+// src/utils/messages.ts
 export function getSiblingToolUseIDsFromLookup(
   message: NormalizedMessage,
   lookups: MessageLookups,
@@ -669,7 +669,7 @@ export function getProgressMessagesFromLookup(
 
 **信息性消息**：
 ```typescript
-// src/utils/messages.ts 第 4335-4352 行
+// src/utils/messages.ts
 export function createSystemMessage(
   content: string,
   level: SystemMessageLevel,
@@ -679,7 +679,7 @@ export function createSystemMessage(
 
 **压缩边界消息**：
 ```typescript
-// src/utils/messages.ts 第 4530-4555 行
+// src/utils/messages.ts
 export function createCompactBoundaryMessage(
   trigger: 'manual' | 'auto',
   preTokens: number,
@@ -689,7 +689,7 @@ export function createCompactBoundaryMessage(
 
 **API 指标消息**：
 ```typescript
-// src/utils/messages.ts 第 4483-4514 行
+// src/utils/messages.ts
 export function createApiMetricsMessage(metrics: {
   ttftMs: number
   otps: number
@@ -702,7 +702,7 @@ export function createApiMetricsMessage(metrics: {
 压缩边界消息标记对话压缩的位置：
 
 ```typescript
-// src/utils/messages.ts 第 4608-4629 行
+// src/utils/messages.ts
 export function isCompactBoundaryMessage(
   message: Message | NormalizedMessage,
 ): message is SystemCompactBoundaryMessage {
@@ -725,7 +725,7 @@ export function findLastCompactBoundaryIndex<T extends Message | NormalizedMessa
 获取压缩边界后的消息：
 
 ```typescript
-// src/utils/messages.ts 第 4643-4656 行
+// src/utils/messages.ts
 export function getMessagesAfterCompactBoundary<T extends Message | NormalizedMessage>(
   messages: T[],
   options?: { includeSnipped?: boolean },
@@ -747,7 +747,7 @@ export function getMessagesAfterCompactBoundary<T extends Message | NormalizedMe
 `handleMessageFromStream` 函数处理流式响应中的各种事件：
 
 ```typescript
-// src/utils/messages.ts 第 2930-3095 行
+// src/utils/messages.ts
 export function handleMessageFromStream(
   message: Message | TombstoneMessage | StreamEvent | RequestStartEvent,
   onMessage: (message: Message) => void,
@@ -781,7 +781,7 @@ export function handleMessageFromStream(
 流式响应中的工具调用需要特殊处理：
 
 ```typescript
-// src/utils/messages.ts 第 2915-2919 行
+// src/utils/messages.ts
 export type StreamingToolUse = {
   index: number
   contentBlock: BetaToolUseBlock
@@ -796,7 +796,7 @@ export type StreamingToolUse = {
 系统定义了一些特殊用途的合成消息：
 
 ```typescript
-// src/utils/messages.ts 第 207-241 行
+// src/utils/messages.ts
 export const INTERRUPT_MESSAGE = '[Request interrupted by user]'
 export const INTERRUPT_MESSAGE_FOR_TOOL_USE = '[Request interrupted by user for tool use]'
 export const CANCEL_MESSAGE = "The user doesn't want to take this action right now..."
@@ -828,7 +828,7 @@ export function isSyntheticMessage(message: Message): boolean {
 创建用户中断消息：
 
 ```typescript
-// src/utils/messages.ts 第 545-560 行
+// src/utils/messages.ts
 export function createUserInterruptionMessage({
   toolUse = false,
 }): UserMessage {
@@ -847,7 +847,7 @@ export function createUserInterruptionMessage({
 从消息中提取文本内容：
 
 ```typescript
-// src/utils/messages.ts 第 2861-2871 行
+// src/utils/messages.ts
 export function getUserMessageText(
   message: Message | NormalizedMessage,
 ): string | null {
@@ -872,7 +872,7 @@ export function getContentText(
 统计工具调用次数：
 
 ```typescript
-// src/utils/messages.ts 第 4691-4713 行
+// src/utils/messages.ts
 export function countToolCalls(
   messages: Message[],
   toolName: string,
@@ -901,7 +901,7 @@ export function countToolCalls(
 为拆分后的消息生成确定性 UUID：
 
 ```typescript
-// src/utils/messages.ts 第 725-728 行
+// src/utils/messages.ts
 export function deriveUUID(parentUUID: UUID, index: number): UUID {
   const hex = index.toString(16).padStart(12, '0')
   return `${parentUUID.slice(0, 24)}${hex}` as UUID
@@ -923,4 +923,4 @@ export function deriveUUID(parentUUID: UUID, index: number): UUID {
 
 ---
 
-*本章分析了 Claude Code 消息处理系统的核心实现，涵盖了消息类型定义、内容块处理、附件消息、进度消息和系统消息等方面。相关源文件包括 `src/utils/messages.ts`、`src/utils/attachments.ts` 和 `src/utils/messagePredicates.ts`。*
+*本章分析了 Claude Code 消息处理系统的核心实现，涵盖了消息类型定义、内容块处理、附件消息、进度消息和系统消息等方面。相关源文件包括 `src/utils/messages.ts`、`src/utils/attachments.ts` 和 `src/utils/messagePredicates.ts`（注：所有源码均为 TypeScript）。*

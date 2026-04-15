@@ -52,7 +52,7 @@ repo/
 └── src/
 ```
 
-命名规则定义在 `src/utils/worktree.ts:48-87`：
+命名规则定义在 `src/utils/worktree.ts`：
 
 ```typescript
 const VALID_WORKTREE_SLUG_SEGMENT = /^[a-zA-Z0-9._-]+$/
@@ -91,7 +91,7 @@ export function validateWorktreeSlug(slug: string): void {
 
 ### 16.3.1 工具定义
 
-EnterWorktreeTool 定义在 `src/tools/EnterWorktreeTool/EnterWorktreeTool.ts:52-127`：
+EnterWorktreeTool 定义在 `src/tools/EnterWorktreeTool/EnterWorktreeTool.ts`：
 
 ```typescript
 export const EnterWorktreeTool: Tool<InputSchema, Output> = buildTool({
@@ -137,7 +137,7 @@ export const EnterWorktreeTool: Tool<InputSchema, Output> = buildTool({
 
 ### 16.3.2 输入 Schema
 
-输入定义在 `src/tools/EnterWorktreeTool/EnterWorktreeTool.ts:23-39`：
+输入定义在 `src/tools/EnterWorktreeTool/EnterWorktreeTool.ts`：
 
 ```typescript
 const inputSchema = lazySchema(() =>
@@ -167,7 +167,7 @@ const inputSchema = lazySchema(() =>
 
 ### 16.3.3 Prompt 设计
 
-Prompt 定义在 `src/tools/EnterWorktreeTool/prompt.ts:1-30`：
+Prompt 定义在 `src/tools/EnterWorktreeTool/prompt.ts`：
 
 ```typescript
 export function getEnterWorktreeToolPrompt(): string {
@@ -199,7 +199,7 @@ export function getEnterWorktreeToolPrompt(): string {
 
 ### 16.3.4 Worktree 创建流程
 
-核心创建逻辑定义在 `src/utils/worktree.ts:235-375`：
+核心创建逻辑定义在 `src/utils/worktree.ts`：
 
 ```mermaid
 flowchart TD
@@ -263,7 +263,7 @@ if (sparsePaths?.length) {
 
 ### 16.3.5 后创建设置
 
-创建后的设置定义在 `src/utils/worktree.ts:510-624`：
+创建后的设置定义在 `src/utils/worktree.ts`：
 
 ```mermaid
 flowchart TD
@@ -333,7 +333,7 @@ flowchart TD
 
 ### 16.4.1 工具定义
 
-ExitWorktreeTool 定义在 `src/tools/ExitWorktreeTool/ExitWorktreeTool.ts:148-329`：
+ExitWorktreeTool 定义在 `src/tools/ExitWorktreeTool/ExitWorktreeTool.ts`：
 
 ```typescript
 export const ExitWorktreeTool: Tool<InputSchema, Output> = buildTool({
@@ -381,7 +381,7 @@ export const ExitWorktreeTool: Tool<InputSchema, Output> = buildTool({
 
 ### 16.4.2 输入 Schema
 
-输入定义在 `src/tools/ExitWorktreeTool/ExitWorktreeTool.ts:30-44`：
+输入定义在 `src/tools/ExitWorktreeTool/ExitWorktreeTool.ts`：
 
 ```typescript
 const inputSchema = lazySchema(() =>
@@ -406,7 +406,7 @@ const inputSchema = lazySchema(() =>
 
 ### 16.4.3 安全验证机制
 
-变更计数定义在 `src/tools/ExitWorktreeTool/ExitWorktreeTool.ts:79-113`：
+变更计数定义在 `src/tools/ExitWorktreeTool/ExitWorktreeTool.ts`：
 
 ```typescript
 async function countWorktreeChanges(
@@ -438,7 +438,7 @@ async function countWorktreeChanges(
 
 ### 16.4.4 Prompt 设计
 
-Prompt 定义在 `src/tools/ExitWorktreeTool/prompt.ts:1-32`：
+Prompt 定义在 `src/tools/ExitWorktreeTool/prompt.ts`：
 
 ```typescript
 export function getExitWorktreeToolPrompt(): string {
@@ -470,7 +470,7 @@ It will NOT touch:
 
 ### 16.4.5 Session 状态恢复
 
-恢复逻辑定义在 `src/tools/ExitWorktreeTool/ExitWorktreeTool.ts:122-146`：
+恢复逻辑定义在 `src/tools/ExitWorktreeTool/ExitWorktreeTool.ts`：
 
 ```typescript
 function restoreSessionToOriginalCwd(
@@ -502,7 +502,7 @@ function restoreSessionToOriginalCwd(
 
 ### 16.5.1 Session 类型定义
 
-WorktreeSession 定义在 `src/utils/worktree.ts:140-154`：
+WorktreeSession 定义在 `src/utils/worktree.ts`：
 
 ```typescript
 export type WorktreeSession = {
@@ -522,7 +522,7 @@ export type WorktreeSession = {
 
 ### 16.5.2 Session 存储
 
-全局 session 状态定义在 `src/utils/worktree.ts:156-169`：
+全局 session 状态定义在 `src/utils/worktree.ts`：
 
 ```typescript
 let currentWorktreeSession: WorktreeSession | null = null
@@ -547,7 +547,7 @@ export function restoreWorktreeSession(session: WorktreeSession | null): void {
 对于非 Git 环境，Claude Code 支持通过 hooks 实现 VCS 隔离：
 
 ```typescript
-// src/utils/hooks.ts:4910-4952
+// Worktree Hooks 检查与执行
 export function hasWorktreeCreateHook(): boolean {
   const snapshotHooks = getHooksConfigFromSnapshot()?.['WorktreeCreate']
   const registeredHooks = getRegisteredHooks()?.['WorktreeCreate']
@@ -565,7 +565,7 @@ export async function executeWorktreeCreateHook(slug: string) {
 }
 ```
 
-**Hook Schema**（`src/types/hooks.ts:160-163`）：
+**Hook Schema**：
 
 ```typescript
 z.object({
@@ -576,7 +576,7 @@ z.object({
 
 ### 16.6.2 创建流程分支
 
-定义在 `src/utils/worktree.ts:702-778`：
+创建流程分支定义在 `src/utils/worktree.ts`：
 
 ```mermaid
 flowchart TD
@@ -654,7 +654,7 @@ flowchart TD
 
 除用户手动触发外，Agent 和 Workflow 也使用 worktree：
 
-定义在 `src/utils/worktree.ts:902-952`：
+定义在 `src/utils/worktree.ts`：
 
 ```typescript
 export async function createAgentWorktree(slug: string): Promise<{
@@ -701,7 +701,7 @@ const EPHEMERAL_WORKTREE_PATTERNS = [
 
 ### 16.8.1 EnterWorktree UI
 
-定义在 `src/tools/EnterWorktreeTool/UI.tsx:7-19`：
+EnterWorktree UI 定义在 `src/tools/EnterWorktreeTool/UI.tsx`：
 
 ```typescript
 export function renderToolUseMessage(): React.ReactNode {
@@ -722,7 +722,7 @@ export function renderToolResultMessage(output: Output, ...): React.ReactNode {
 
 ### 16.8.2 ExitWorktree UI
 
-定义在 `src/tools/ExitWorktreeTool/UI.tsx:7-24`：
+ExitWorktree UI 定义在 `src/tools/ExitWorktreeTool/UI.tsx`：
 
 ```typescript
 export function renderToolUseMessage(): React.ReactNode {

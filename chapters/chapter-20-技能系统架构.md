@@ -70,8 +70,8 @@ hooks:
 
 **字段解析表**：
 
-| 字段名 | 类型 | 必填 | 说明 | 代码行号 |
-|--------|------|------|------|----------|
+| 字段名 | 类型 | 必填 | 说明 |
+|--------|------|------|------|
 | `name` | `string` | 否 | 显示名称（默认取目录名） | loadSkillsDir.ts:238-239 |
 | `description` | `string` | 否 | 技能描述（可从正文提取） | loadSkillsDir.ts:210-214 |
 | `when_to_use` | `string` | 否 | 使用场景说明 | loadSkillsDir.ts:252 |
@@ -194,7 +194,7 @@ flowchart TB
 6. **Bundled Skills**：CLI 内置技能
 
 ```typescript
-// loadSkillsDir.ts:679-714 - 并行加载各来源
+// 并行加载各来源
 const [
   managedSkills,
   userSkills,

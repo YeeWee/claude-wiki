@@ -17,7 +17,7 @@
 
 ### 11.2.1 工具定义
 
-GlobTool 定义在 `src/tools/GlobTool/GlobTool.ts:57-198`，使用 `buildTool()` 工厂函数构建：
+GlobTool 定义在 `src/tools/GlobTool/GlobTool.ts`，使用 `buildTool()` 工厂函数构建：
 
 ```typescript
 export const GlobTool = buildTool({
@@ -83,7 +83,7 @@ async call(input, { abortController, getAppState, globLimits }) {
 
 ### 11.2.3 glob() 函数实现
 
-`glob()` 函数定义在 `src/utils/glob.ts:66-130`，底层使用 ripgrep 的 `--files` 模式：
+`glob()` 函数定义在 `src/utils/glob.ts`，底层使用 ripgrep 的 `--files` 模式：
 
 ```typescript
 export async function glob(
@@ -132,7 +132,7 @@ export async function glob(
 
 ### 11.2.4 extractGlobBaseDirectory() - 路径解析
 
-此函数从 glob 模式中提取静态基础目录，定义在 `src/utils/glob.ts:17-64`：
+此函数从 glob 模式中提取静态基础目录，定义在 `src/utils/glob.ts`：
 
 ```typescript
 export function extractGlobBaseDirectory(pattern: string): {
@@ -189,7 +189,7 @@ const hidden = isEnvTruthy(process.env.CLAUDE_CODE_GLOB_HIDDEN || 'true')
 
 ### 11.3.1 工具定义
 
-GrepTool 定义在 `src/tools/GrepTool/GrepTool.ts:160-577`，功能更复杂：
+GrepTool 定义在 `src/tools/GrepTool/GrepTool.ts`，功能更复杂：
 
 ```typescript
 export const GrepTool = buildTool({
@@ -407,7 +407,7 @@ const sortedMatches = results
 
 ### 11.4.1 ripgrep 配置发现
 
-`getRipgrepConfig()` 函数确定 ripgrep 的运行模式，定义在 `src/utils/ripgrep.ts:31-65`：
+`getRipgrepConfig()` 函数确定 ripgrep 的运行模式：
 
 ```typescript
 const getRipgrepConfig = memoize((): RipgrepConfig => {
@@ -453,7 +453,7 @@ const getRipgrepConfig = memoize((): RipgrepConfig => {
 
 ### 11.4.2 ripGrep() 函数
 
-`ripGrep()` 是搜索的核心函数，定义在 `src/utils/ripgrep.ts:345-463`：
+`ripGrep()` 是搜索的核心函数：
 
 ```typescript
 export async function ripGrep(
@@ -521,7 +521,7 @@ function isEagainError(stderr: string): boolean {
 
 ### 11.4.4 超时机制
 
-ripgrep 有内置超时机制，定义在 `src/utils/ripgrep.ts:128-133`：
+ripgrep 有内置超时机制：
 
 ```typescript
 const defaultTimeout = getPlatform() === 'wsl' ? 60_000 : 20_000
@@ -541,7 +541,7 @@ const timeout = parsedSeconds > 0 ? parsedSeconds * 1000 : defaultTimeout
 
 ### 11.4.5 macOS 代码签名
 
-在 macOS 上，捆绑的 ripgrep 二进制可能需要代码签名，定义在 `src/utils/ripgrep.ts:619-679`：
+在 macOS 上，捆绑的 ripgrep 二进制可能需要代码签名。这是由于 macOS 的安全机制，当二进制文件从网络下载或被修改后，系统可能阻止其执行。Claude Code 自动检测并处理这种情况：
 
 ```typescript
 async function codesignRipgrepIfNecessary() {
@@ -598,7 +598,7 @@ const finalLines = limitedResults.map(line => {
 
 ### 11.5.2 UI 渲染
 
-两个工具共享相同的 UI 渲染组件。`SearchResultSummary` 组件定义在 `src/tools/GrepTool/UI.tsx:16-118`：
+两个工具共享相同的 UI 渲染组件。`SearchResultSummary` 组件定义在 `src/tools/GrepTool/UI.tsx`：
 
 ```typescript
 function SearchResultSummary({
@@ -682,7 +682,7 @@ export function renderToolUseErrorMessage(result, { verbose }) {
 
 ### 11.6.2 流式处理
 
-`ripGrepStream()` 函数支持流式输出，定义在 `src/utils/ripgrep.ts:295-343`：
+`ripGrepStream()` 函数支持流式输出：
 
 ```typescript
 export async function ripGrepStream(
@@ -710,7 +710,7 @@ export async function ripGrepStream(
 
 ### 11.6.3 文件计数优化
 
-`countFilesRoundedRg()` 函数使用 ripgrep 快速统计文件数量，定义在 `src/utils/ripgrep.ts:476-522`：
+`countFilesRoundedRg()` 函数使用 ripgrep 快速统计文件数量：
 
 ```typescript
 export const countFilesRoundedRg = memoize(

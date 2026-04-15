@@ -1,5 +1,7 @@
 # 第四十四章：历史与回放
 
+> 本章基于 Claude Code 源代码分析，请以最新版本为准。
+
 ## 44.1 引言：Session History
 
 命令历史是 CLI 应用的核心用户体验之一。Claude Code 的历史系统不仅支持用户通过上下键快速访问之前的命令，还提供了 Ctrl+R 搜索功能，让用户能够快速定位和复用历史输入。
@@ -29,7 +31,7 @@ Claude Code 的历史系统设计具有以下特点：
 history.ts 采用模块级状态管理模式：
 
 ```typescript
-// src/history.ts:281-289
+// src/history.ts - 模块状态定义区域
 let pendingEntries: LogEntry[] = []
 let isWriting = false
 let currentFlushPromise: Promise<void> | null = null
@@ -54,7 +56,7 @@ const skippedTimestamps = new Set<number>()
 历史条目以 JSONL 格式存储，每行一个 LogEntry：
 
 ```typescript
-// src/history.ts:219-225
+// src/history.ts - LogEntry 类型定义区域
 type LogEntry = {
   display: string                              // 显示文本
   pastedContents: Record<number, StoredPastedContent>  // 粘贴内容
@@ -67,7 +69,7 @@ type LogEntry = {
 StoredPastedContent 处理大文本的存储策略：
 
 ```typescript
-// src/history.ts:24-32
+// src/history.ts - StoredPastedContent 类型定义区域
 type StoredPastedContent = {
   id: number
   type: 'text' | 'image'
@@ -128,7 +130,7 @@ stateDiagram-v2
 ### 44.2.4 addToHistory 函数实现
 
 ```typescript
-// src/history.ts:411-434
+// src/history.ts - addToHistory 函数区域
 export function addToHistory(command: HistoryEntry | string): void {
   // 跳过 tmux 会话的历史记录
   if (isEnvTruthy(process.env.CLAUDE_CODE_SKIP_PROMPT_HISTORY)) {
@@ -163,7 +165,7 @@ export function addToHistory(command: HistoryEntry | string): void {
 写入磁盘的核心逻辑：
 
 ```typescript
-// src/history.ts:292-327
+// src/history.ts - immediateFlushHistory 函数区域
 async function immediateFlushHistory(): Promise<void> {
   if (pendingEntries.length === 0) {
     return
@@ -207,7 +209,7 @@ async function immediateFlushHistory(): Promise<void> {
 重试机制的实现：
 
 ```typescript
-// src/history.ts:329-353
+// src/history.ts - flushPromptHistory 函数区域
 async function flushPromptHistory(retries: number): Promise<void> {
   if (isWriting || pendingEntries.length === 0) {
     return
@@ -268,7 +270,7 @@ async function flushPromptHistory(retries: number): Promise<void> {
 **解析函数**：
 
 ```typescript
-// src/history.ts:62-75
+// src/history.ts - parseReferences 函数区域
 export function parseReferences(
   input: string,
 ): Array<{ id: number; match: string; index: number }> {
@@ -288,7 +290,7 @@ export function parseReferences(
 **展开粘贴引用**：
 
 ```typescript
-// src/history.ts:81-100
+// src/history.ts - expandPastedTextRefs 函数区域
 export function expandPastedTextRefs(
   input: string,
   pastedContents: Record<number, PastedContent>,
@@ -316,7 +318,7 @@ export function expandPastedTextRefs(
 当粘贴内容超过 `MAX_PASTED_CONTENT_LENGTH`（1024 字符）时，存储到外部文件：
 
 ```typescript
-// src/history.ts:370-393
+// src/history.ts - 大文本存储判断区域
 // 小文本：内联存储
 if (content.content.length <= MAX_PASTED_CONTENT_LENGTH) {
   storedPastedContents[Number(id)] = {
@@ -344,7 +346,7 @@ if (content.content.length <= MAX_PASTED_CONTENT_LENGTH) {
 读取时的解析逻辑：
 
 ```typescript
-// src/history.ts:230-260
+// src/history.ts - resolveStoredPastedContent 函数区域
 async function resolveStoredPastedContent(
   stored: StoredPastedContent,
 ): Promise<PastedContent | null> {
@@ -387,7 +389,7 @@ async function resolveStoredPastedContent(
 `getHistory` 函数实现了会话历史读取：
 
 ```typescript
-// src/history.ts:190-217
+// src/history.ts - getHistory 函数区域
 export async function* getHistory(): AsyncGenerator<HistoryEntry> {
   const currentProject = getProjectRoot()
   const currentSession = getSessionId()
@@ -430,7 +432,7 @@ export async function* getHistory(): AsyncGenerator<HistoryEntry> {
 ### 44.4.2 makeLogEntryReader 实现
 
 ```typescript
-// src/history.ts:106-143
+// src/history.ts - makeLogEntryReader 函数区域
 async function* makeLogEntryReader(): AsyncGenerator<LogEntry> {
   const currentSession = getSessionId()
 
@@ -477,7 +479,7 @@ async function* makeLogEntryReader(): AsyncGenerator<LogEntry> {
 Ctrl+R 搜索使用 `getTimestampedHistory`：
 
 ```typescript
-// src/history.ts:151-156
+// src/history.ts - TimestampedHistoryEntry 类型定义区域
 export type TimestampedHistoryEntry = {
   display: string           // 显示文本
   timestamp: number         // 时间戳（用于排序）
@@ -529,7 +531,7 @@ export async function* getTimestampedHistory(): AsyncGenerator<TimestampedHistor
 `removeLastFromHistory` 实现了历史撤销功能：
 
 ```typescript
-// src/history.ts:443-464
+// src/history.ts - removeLastFromHistory 函数区域
 export function removeLastFromHistory(): void {
   if (!lastAddedEntry) return
   const entry = lastAddedEntry
@@ -568,7 +570,7 @@ if (idx !== -1) {
 ### 44.5.2 清空待处理历史
 
 ```typescript
-// src/history.ts:436-440
+// src/history.ts - clearPendingHistoryEntries 函数区域
 export function clearPendingHistoryEntries(): void {
   pendingEntries = []
   lastAddedEntry = null
@@ -586,7 +588,7 @@ export function clearPendingHistoryEntries(): void {
 历史系统通过 `sessionId` 和 `project` 字段实现隔离：
 
 ```typescript
-// src/history.ts:397-404
+// src/history.ts - logEntry 对象构建区域
 const logEntry: LogEntry = {
   ...entry,
   pastedContents: storedPastedContents,

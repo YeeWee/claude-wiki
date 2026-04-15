@@ -17,7 +17,7 @@ Web 工具集是 Claude Code 与外部世界交互的关键组件。通过 WebFe
 
 ### 13.2.1 工具定义
 
-WebFetchTool 定义在 `src/tools/WebFetchTool/WebFetchTool.ts:66-307`，使用 `buildTool()` 工厂函数创建：
+WebFetchTool 定义在 `src/tools/WebFetchTool/WebFetchTool.ts`，使用 `buildTool()` 工厂函数创建：
 
 ```typescript
 export const WebFetchTool = buildTool({
@@ -74,7 +74,7 @@ const outputSchema = lazySchema(() =>
 
 ### 13.2.3 权限检查机制
 
-WebFetchTool 实现了多层权限检查，定义在 `src/tools/WebFetchTool/WebFetchTool.ts:104-180`：
+WebFetchTool 实现了多层权限检查：
 
 **权限检查流程**：
 
@@ -122,7 +122,7 @@ function webFetchToolInputToPermissionRuleContent(input: { [k: string]: unknown 
 
 ### 13.2.4 预批准域名列表
 
-预批准域名列表定义在 `src/tools/WebFetchTool/preapproved.ts:14-131`，包含编程相关的官方文档站点：
+预批准域名列表定义在 `src/tools/WebFetchTool/preapproved.ts`，包含编程相关的官方文档站点：
 
 **分类示例**：
 
@@ -160,7 +160,7 @@ export function isPreapprovedHost(hostname: string, pathname: string): boolean {
 
 ### 13.3.1 call() 方法实现
 
-`call()` 方法是工具执行的核心，定义在 `src/tools/WebFetchTool/WebFetchTool.ts:208-299`：
+`call()` 方法是工具执行的核心：
 
 ```typescript
 async call({ url, prompt }, { abortController, options }) {
@@ -273,7 +273,7 @@ sequenceDiagram
 
 ### 13.4.1 getURLMarkdownContent() 实现
 
-核心内容获取函数定义在 `src/tools/WebFetchTool/utils.ts:347-482`：
+核心内容获取函数定义在 `src/tools/WebFetchTool/utils.ts`：
 
 **主要处理流程**：
 
@@ -315,7 +315,7 @@ sequenceDiagram
 
 ### 13.4.2 缓存机制
 
-缓存配置定义在 `src/tools/WebFetchTool/utils.ts:63-69`：
+缓存配置定义在 `src/tools/WebFetchTool/utils.ts`：
 
 ```typescript
 const CACHE_TTL_MS = 15 * 60 * 1000 // 15 分钟
@@ -351,7 +351,7 @@ type CacheEntry = {
 
 ### 13.4.3 HTML 转 Markdown
 
-Turndown 服务惰性加载，定义在 `src/tools/WebFetchTool/utils.ts:90-97`：
+Turndown 服务惰性加载：
 
 ```typescript
 let turndownServicePromise: Promise<InstanceType<TurndownCtor>> | undefined
@@ -387,7 +387,7 @@ if (isBinaryContentType(contentType)) {
 
 ### 13.4.5 applyPromptToMarkdown() 实现
 
-内容处理函数定义在 `src/tools/WebFetchTool/utils.ts:484-530`：
+内容处理函数定义在 `src/tools/WebFetchTool/utils.ts`：
 
 ```typescript
 export async function applyPromptToMarkdown(
@@ -422,7 +422,7 @@ export const MAX_MARKDOWN_LENGTH = 100_000
 
 ### 13.5.1 重定向检查策略
 
-按照 PSR（产品安全审查）要求，WebFetchTool 不会自动跟随跨域重定向，定义在 `src/tools/WebFetchTool/utils.ts:212-243`：
+按照 PSR（产品安全审查）要求，WebFetchTool 不会自动跟随跨域重定向：
 
 ```typescript
 export function isPermittedRedirect(originalUrl: string, redirectUrl: string): boolean {
@@ -457,7 +457,7 @@ export function isPermittedRedirect(originalUrl: string, redirectUrl: string): b
 
 ### 13.5.2 重定向限制
 
-定义在 `src/tools/WebFetchTool/utils.ts:125`：
+定义在 `src/tools/WebFetchTool/utils.ts`：
 
 ```typescript
 const MAX_REDIRECTS = 10
@@ -505,7 +505,7 @@ export async function getWithPermittedRedirects(
 
 ### 13.6.1 域名黑名单检查
 
-定义在 `src/tools/WebFetchTool/utils.ts:176-203`：
+域名黑名单检查定义在 `src/tools/WebFetchTool/utils.ts`：
 
 ```typescript
 export async function checkDomainBlocklist(domain: string): Promise<DomainCheckResult> {
@@ -539,7 +539,7 @@ type DomainCheckResult =
 
 ### 13.6.2 域名检查缓存
 
-定义在 `src/tools/WebFetchTool/utils.ts:75-78`：
+域名检查缓存配置：
 
 ```typescript
 const DOMAIN_CHECK_CACHE = new LRUCache<string, true>({
@@ -552,7 +552,7 @@ const DOMAIN_CHECK_CACHE = new LRUCache<string, true>({
 
 ### 13.6.3 自定义错误类型
 
-定义在 `src/tools/WebFetchTool/utils.ts:21-48`：
+自定义错误类型定义：
 
 ```typescript
 class DomainBlockedError extends Error {
@@ -595,7 +595,7 @@ class EgressBlockedError extends Error {
 
 ### 13.7.1 工具定义
 
-WebSearchTool 定义在 `src/tools/WebSearchTool/WebSearchTool.ts:152-435`：
+WebSearchTool 定义在 `src/tools/WebSearchTool/WebSearchTool.ts`：
 
 ```typescript
 export const WebSearchTool = buildTool({
@@ -646,7 +646,7 @@ const outputSchema = lazySchema(() =>
 
 ### 13.7.3 搜索执行流程
 
-`call()` 方法定义在 `src/tools/WebSearchTool/WebSearchTool.ts:254-400`：
+`call()` 方法是搜索执行的入口：
 
 ```typescript
 async call(input, context, _canUseTool, _parentMessage, onProgress) {
@@ -683,7 +683,7 @@ async call(input, context, _canUseTool, _parentMessage, onProgress) {
 
 ### 13.7.4 Anthropic API 搜索工具 Schema
 
-定义在 `src/tools/WebSearchTool/WebSearchTool.ts:76-84`：
+Anthropic API 搜索工具 Schema 定义：
 
 ```typescript
 function makeToolSchema(input: Input): BetaWebSearchTool20250305 {
@@ -701,7 +701,7 @@ function makeToolSchema(input: Input): BetaWebSearchTool20250305 {
 
 ### 13.7.5 结果解析
 
-`makeOutputFromSearchResponse()` 定义在 `src/tools/WebSearchTool/WebSearchTool.ts:86-150`：
+`makeOutputFromSearchResponse()` 结果解析函数：
 
 ```typescript
 function makeOutputFromSearchResponse(
@@ -741,7 +741,7 @@ function makeOutputFromSearchResponse(
 
 ### 13.8.1 WebFetchTool UI
 
-定义在 `src/tools/WebFetchTool/UI.tsx:9-72`：
+WebFetchTool UI 渲染组件定义在 `src/tools/WebFetchTool/UI.tsx`：
 
 **渲染函数分析**：
 
@@ -777,7 +777,7 @@ export function renderToolResultMessage({ bytes, code, codeText, result }: Outpu
 
 ### 13.8.2 WebSearchTool UI
 
-定义在 `src/tools/WebSearchTool/UI.tsx:8-100`：
+WebSearchTool UI 渲染组件定义在 `src/tools/WebSearchTool/UI.tsx`：
 
 **进度渲染**（第 55-78 行）：
 
@@ -824,7 +824,7 @@ export function renderToolResultMessage(output: Output) {
 
 ### 13.9.1 WebFetchTool 提示
 
-定义在 `src/tools/WebFetchTool/prompt.ts:3-21`：
+WebFetchTool 提示定义在 `src/tools/WebFetchTool/prompt.ts`：
 
 ```typescript
 export const DESCRIPTION = `
@@ -854,7 +854,7 @@ return `IMPORTANT: WebFetch WILL FAIL for authenticated or private URLs. Before 
 
 ### 13.9.2 WebSearchTool 提示
 
-定义在 `src/tools/WebSearchTool/prompt.ts:5-34`：
+WebSearchTool 提示定义在 `src/tools/WebSearchTool/prompt.ts`：
 
 ```typescript
 export function getWebSearchPrompt(): string {

@@ -1,5 +1,7 @@
 # 第 41 章：语音模式
 
+> 本章基于 Claude Code 源代码分析，请以最新版本为准。
+
 ## 41.1 引言
 
 语音模式是 Claude Code 提供的一项免手交互功能，允许用户通过语音输入来与 Claude 进行对话。这一功能特别适用于以下场景：
@@ -42,7 +44,7 @@ export type VoiceState = {
 
 ### 41.2.2 VoiceProvider 实现
 
-**文件：`src/context/voice.tsx`（第 23-42 行）**
+**文件：`src/context/voice.tsx`（VoiceProvider 初始化区域）**
 
 ```typescript
 export function VoiceProvider({ children }: Props): React.ReactNode {
@@ -65,7 +67,7 @@ VoiceProvider 采用单例 Store 模式：
 
 语音上下文提供三个访问 Hook，满足不同使用场景：
 
-**useVoiceState（第 55-69 行）**：订阅式状态读取
+**useVoiceState（状态订阅读取 Hook 区域）**
 
 ```typescript
 export function useVoiceState<T>(selector: (state: VoiceState) => T): T {
@@ -80,7 +82,7 @@ export function useVoiceState<T>(selector: (state: VoiceState) => T): T {
 - 通过 selector 函数实现精确订阅，只在选中值变化时重渲染
 - 支持 Object.is 比较，避免无效渲染
 
-**useSetVoiceState（第 76-78 行）**：获取状态更新器
+**useSetVoiceState（状态更新器获取区域）**
 
 ```typescript
 export function useSetVoiceState() {
@@ -90,7 +92,7 @@ export function useSetVoiceState() {
 
 返回 Store 的 `setState` 方法，用于事件处理器中更新状态。
 
-**useGetVoiceState（第 85-87 行）**：同步状态读取
+**useGetVoiceState（同步状态读取区域）**
 
 ```typescript
 export function useGetVoiceState() {
@@ -106,7 +108,7 @@ export function useGetVoiceState() {
 
 ### 41.3.1 WebSocket 连接建立
 
-**文件：`src/services/voiceStreamSTT.ts`（第 111-175 行）**
+**文件：`src/services/voiceStreamSTT.ts`（WebSocket 连接建立区域）**
 
 ```typescript
 export async function connectVoiceStream(
@@ -182,7 +184,7 @@ const GLOBAL_KEYTERMS: readonly string[] = [
 ];
 ```
 
-关键词来源（第 63-106 行）：
+关键词来源（动态提取区域）：
 
 1. **全局术语**：预定义的编程常用词汇
 2. **项目名称**：从项目根目录名提取
@@ -228,7 +230,7 @@ export async function getVoiceKeyterms(
 
 ### 41.3.3 WebSocket 消息协议
 
-**文件：`src/services/voiceStreamSTT.ts`（第 74-95 行）**
+**文件：`src/services/voiceStreamSTT.ts`（消息类型定义区域）**
 
 服务器消息类型定义：
 
@@ -256,7 +258,7 @@ const KEEPALIVE_MSG = '{"type":"KeepAlive"}'
 const CLOSE_STREAM_MSG = '{"type":"CloseStream"}'
 ```
 
-消息处理流程（第 357-461 行）：
+消息处理流程（消息处理区域）：
 
 ```typescript
 ws.on('message', (raw: Buffer | string) => {
@@ -287,7 +289,7 @@ ws.on('message', (raw: Buffer | string) => {
 
 ### 41.3.4 连接保活机制
 
-**文件：`src/services/voiceStreamSTT.ts`（第 322-348 行）**
+**文件：`src/services/voiceStreamSTT.ts`（保活机制区域）**
 
 ```typescript
 ws.on('open', () => {
@@ -495,7 +497,7 @@ flowchart TB
 
 ### 41.5.2 按键处理机制
 
-**文件：`src/hooks/useVoice.ts`（第 1022-1127 行）**
+**文件：`src/hooks/useVoice.ts`（按键处理机制区域）**
 
 按键处理采用"按键间隙检测"策略：
 
@@ -557,7 +559,7 @@ const handleKeyEvent = useCallback((fallbackMs = REPEAT_FALLBACK_MS): void => {
 
 ### 41.5.3 音频捕获实现
 
-**文件：`src/services/voice.ts`（第 335-396 行）**
+**文件：`src/services/voice.ts`（音频捕获实现区域）**
 
 音频捕获支持多种后端：
 
@@ -605,7 +607,7 @@ export async function startRecording(
 
 ### 41.5.4 录音会话启动
 
-**文件：`src/hooks/useVoice.ts`（第 633-1011 行）**
+**文件：`src/hooks/useVoice.ts`（录音会话启动区域）**
 
 录音会话启动流程：
 
@@ -671,7 +673,7 @@ async function startRecordingSession(): Promise<void> {
 
 ### 41.5.5 转录结果处理
 
-**文件：`src/hooks/useVoice.ts`（第 783-839 行）**
+**文件：`src/hooks/useVoice.ts`（转录结果处理区域）**
 
 转录回调处理：
 
@@ -707,7 +709,7 @@ onTranscript: (text: string, isFinal: boolean) => {
 
 ### 41.5.6 录音结束处理
 
-**文件：`src/hooks/useVoice.ts`（第 322-521 行）**
+**文件：`src/hooks/useVoice.ts`（录音结束处理区域）**
 
 ```typescript
 function finishRecording(): void {
@@ -821,7 +823,7 @@ const handleVoiceTranscript = useCallback((text: string) => {
 
 ### 41.6.1 语言代码映射
 
-**文件：`src/hooks/useVoice.ts`（第 42-114 行）**
+**文件：`src/hooks/useVoice.ts`（语言代码映射区域）**
 
 ```typescript
 const LANGUAGE_NAME_TO_CODE: Record<string, string> = {
@@ -885,7 +887,7 @@ export function normalizeLanguageForSTT(language: string | undefined): {
 
 ### 41.7.1 连接错误重试
 
-**文件：`src/hooks/useVoice.ts`（第 841-903 行）**
+**文件：`src/hooks/useVoice.ts`（连接错误重试区域）**
 
 ```typescript
 onError: (error: string, opts?: { fatal?: boolean }) => {

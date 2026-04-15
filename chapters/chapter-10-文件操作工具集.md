@@ -23,7 +23,7 @@
 FileReadTool 位于 `src/tools/FileReadTool/FileReadTool.ts`，是功能最丰富的文件工具。其输入参数包括：
 
 ```typescript
-// src/tools/FileReadTool/FileReadTool.ts:227-243
+// FileReadTool 输入 Schema
 const inputSchema = lazySchema(() =>
   z.strictObject({
     file_path: z.string().describe('The absolute path to the file to read'),
@@ -54,7 +54,7 @@ const inputSchema = lazySchema(() =>
 FileReadTool 支持多种文件格式，通过 `callInner` 函数的分发逻辑实现：
 
 ```typescript
-// src/tools/FileReadTool/FileReadTool.ts:804-863
+// callInner 多格式分发逻辑
 async function callInner(...) {
   // --- Notebook ---
   if (ext === 'ipynb') {
@@ -84,7 +84,7 @@ async function callInner(...) {
 输出类型通过 discriminated union 定义：
 
 ```typescript
-// src/tools/FileReadTool/FileReadTool.ts:257-331
+// 输出类型通过 discriminated union 定义
 return z.discriminatedUnion('type', [
   z.object({ type: z.literal('text'), file: ... }),
   z.object({ type: z.literal('image'), file: ... }),
@@ -100,7 +100,7 @@ return z.discriminatedUnion('type', [
 读取文本文件时，返回内容使用 `cat -n` 格式添加行号：
 
 ```typescript
-// src/tools/FileReadTool/prompt.ts:14-15
+// 行号格式指令
 export const LINE_FORMAT_INSTRUCTION =
   '- Results are returned using cat -n format, with line numbers starting at 1'
 ```
@@ -113,7 +113,7 @@ FileReadTool 实现了多层安全机制：
 
 **1. 文件大小限制**
 ```typescript
-// src/tools/FileReadTool/FileReadTool.ts:755-772
+// Token 限制验证函数
 async function validateContentTokens(content: string, ext: string, maxTokens?: number) {
   const effectiveMaxTokens = maxTokens ?? getDefaultFileReadingLimits().maxTokens
   const tokenEstimate = roughTokenCountEstimationForFileType(content, ext)
@@ -128,7 +128,7 @@ async function validateContentTokens(content: string, ext: string, maxTokens?: n
 
 **2. 二进制文件检测**
 ```typescript
-// src/tools/FileReadTool/FileReadTool.ts:469-482
+// 二进制文件检测
 if (
   hasBinaryExtension(fullFilePath) &&
   !isPDFExtension(ext) &&
@@ -145,7 +145,7 @@ if (
 **3. 设备文件阻塞检测**
 防止读取会无限输出或阻塞的设备文件：
 ```typescript
-// src/tools/FileReadTool/FileReadTool.ts:97-128
+// 阻塞设备文件列表
 const BLOCKED_DEVICE_PATHS = new Set([
   '/dev/zero', '/dev/random', '/dev/urandom', '/dev/full',
   '/dev/stdin', '/dev/tty', '/dev/console',
@@ -162,7 +162,7 @@ PDF 文件通过 `pdf.ts` 模块处理，支持两种模式：
 2. **页面提取**：大 PDF 需指定页面范围，转换为图像发送
 
 ```typescript
-// src/tools/FileReadTool/FileReadTool.ts:894-1017
+// PDF 文件处理逻辑
 if (isPDFExtension(ext)) {
   if (pages) {
     // 提取指定页面为图像
@@ -182,7 +182,7 @@ if (isPDFExtension(ext)) {
 
 图像处理通过 `readImageWithTokenBudget` 函数实现智能压缩：
 ```typescript
-// src/tools/FileReadTool/FileReadTool.ts:1097-1183
+// 图像处理与智能压缩
 export async function readImageWithTokenBudget(filePath: string, maxTokens: number) {
   // 读取一次
   const imageBuffer = await getFsImplementation().readFileBytes(filePath, maxBytes)
@@ -208,7 +208,7 @@ export async function readImageWithTokenBudget(filePath: string, maxTokens: numb
 FileEditTool 实现精确字符串替换编辑，位于 `src/tools/FileEditTool/FileEditTool.ts`：
 
 ```typescript
-// src/tools/FileEditTool/types.ts:6-19
+// FileEditTool 输入 Schema
 const inputSchema = lazySchema(() =>
   z.strictObject({
     file_path: z.string().describe('The absolute path to the file to modify'),
@@ -232,7 +232,7 @@ const inputSchema = lazySchema(() =>
 FileEditTool 的验证流程非常严格，包含多重检查：
 
 ```typescript
-// src/tools/FileEditTool/FileReadTool.ts:137-361
+// FileEditTool 验证流程
 async validateInput(input: FileEditInput, toolUseContext: ToolUseContext) {
   // 1. 检查新旧字符串是否相同
   if (old_string === new_string) {
@@ -297,7 +297,7 @@ async validateInput(input: FileEditInput, toolUseContext: ToolUseContext) {
 FileEditTool 实现了智能的字符串匹配机制，处理弯引号和直引号的差异：
 
 ```typescript
-// src/tools/FileEditTool/utils.ts:73-93
+// 字符串匹配函数
 export function findActualString(fileContent: string, searchString: string): string | null {
   // 首先尝试精确匹配
   if (fileContent.includes(searchString)) {
@@ -317,7 +317,7 @@ export function findActualString(fileContent: string, searchString: string): str
   return null
 }
 
-// src/tools/FileEditTool/utils.ts:31-37
+// 引号规范化函数定义
 export function normalizeQuotes(str: string): string {
   return str
     .replaceAll(LEFT_SINGLE_CURLY_QUOTE, "'")
@@ -330,7 +330,7 @@ export function normalizeQuotes(str: string): string {
 当文件使用弯引号而模型输出直引号时，编辑后会自动保持文件的引号风格：
 
 ```typescript
-// src/tools/FileEditTool/utils.ts:104-136
+// 引号风格保持函数
 export function preserveQuoteStyle(oldString: string, actualOldString: string, newString: string): string {
   if (oldString === actualOldString) {
     return newString  // 无需规范化
@@ -353,7 +353,7 @@ export function preserveQuoteStyle(oldString: string, actualOldString: string, n
 编辑执行的原子性是设计核心，通过同步操作保证：
 
 ```typescript
-// src/tools/FileEditTool/FileEditTool.ts:387-574
+// FileEditTool call 方法 - 编辑执行
 async call(input: FileEditInput, ...) {
   // 1. 发现技能目录（非阻塞）
   const newSkillDirs = await discoverSkillDirsForPaths([absoluteFilePath], cwd)
@@ -426,7 +426,7 @@ async call(input: FileEditInput, ...) {
 FileWriteTool 用于创建新文件或完整覆盖现有文件：
 
 ```typescript
-// src/tools/FileWriteTool/FileWriteTool.ts:56-65
+// FileWriteTool 输入 Schema
 const inputSchema = lazySchema(() =>
   z.strictObject({
     file_path: z
@@ -443,7 +443,7 @@ const inputSchema = lazySchema(() =>
 
 输出类型通过 `type` 字段区分：
 ```typescript
-// src/tools/FileWriteTool/FileWriteTool.ts:68-89
+// FileWriteTool 输出 Schema
 const outputSchema = lazySchema(() =>
   z.object({
     type: z.enum(['create', 'update']),
@@ -460,7 +460,7 @@ const outputSchema = lazySchema(() =>
 FileWriteTool 的验证同样强调"先读后写"：
 
 ```typescript
-// src/tools/FileWriteTool/FileWriteTool.ts:153-221
+// FileWriteTool 验证流程
 async validateInput({ file_path, content }, toolUseContext: ToolUseContext) {
   // 1. 检查 secrets
   const secretError = checkTeamMemSecrets(fullFilePath, content)
@@ -496,7 +496,7 @@ async validateInput({ file_path, content }, toolUseContext: ToolUseContext) {
 ### 10.4.3 执行流程与原子性保证
 
 ```typescript
-// src/tools/FileWriteTool/FileWriteTool.ts:223-417
+// FileWriteTool call 方法 - 写入执行
 async call({ file_path, content }, ...) {
   // 1. 发现技能目录
   const newSkillDirs = await discoverSkillDirsForPaths([fullFilePath], cwd)
@@ -558,7 +558,7 @@ async call({ file_path, content }, ...) {
 `readFileState` 是文件操作安全的核心机制，通过 `FileStateCache` 类实现：
 
 ```typescript
-// src/utils/fileStateCache.ts:4-15
+// FileState 缓存类型定义
 export type FileState = {
   content: string
   timestamp: number      // 文件修改时间（毫秒）
@@ -577,7 +577,7 @@ export type FileState = {
 ### 10.5.2 LRU 缓存实现
 
 ```typescript
-// src/utils/fileStateCache.ts:30-93
+// FileStateCache LRU 缓存实现
 export class FileStateCache {
   private cache: LRUCache<string, FileState>
 
@@ -613,7 +613,6 @@ export class FileStateCache {
 
 **1. FileReadTool 读取时**
 ```typescript
-// src/tools/FileReadTool/FileReadTool.ts:1032-1037
 readFileState.set(fullFilePath, {
   content,
   timestamp: Math.floor(mtimeMs),
@@ -624,7 +623,6 @@ readFileState.set(fullFilePath, {
 
 **2. FileEditTool 编辑后**
 ```typescript
-// src/tools/FileEditTool/FileEditTool.ts:520-525
 readFileState.set(absoluteFilePath, {
   content: updatedFile,
   timestamp: getFileModificationTime(absoluteFilePath),
@@ -635,7 +633,6 @@ readFileState.set(absoluteFilePath, {
 
 **3. FileWriteTool 写入后**
 ```typescript
-// src/tools/FileWriteTool/FileWriteTool.ts:332-337
 readFileState.set(fullFilePath, {
   content,
   timestamp: getFileModificationTime(fullFilePath),
@@ -651,7 +648,7 @@ readFileState.set(fullFilePath, {
 FileReadTool 实现了智能去重，避免重复发送相同内容：
 
 ```typescript
-// src/tools/FileReadTool/FileReadTool.ts:536-573
+// 去重检查逻辑
 const existingState = readFileState.get(fullFilePath)
 if (existingState && !existingState.isPartialView && existingState.offset !== undefined) {
   const rangeMatch = existingState.offset === offset && existingState.limit === limit
@@ -679,7 +676,7 @@ if (existingState && !existingState.isPartialView && existingState.offset !== un
 返回 `file_unchanged` 类型，提示模型引用之前的读取结果：
 
 ```typescript
-// src/tools/FileReadTool/prompt.ts:7-8
+// 文件未变更提示
 export const FILE_UNCHANGED_STUB =
   'File unchanged since last read. The content from the earlier Read tool_result in this conversation is still current — refer to that instead of re-reading.'
 ```

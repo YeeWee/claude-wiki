@@ -1,5 +1,7 @@
 # 第四十二章：提示建议服务
 
+> 本章基于 Claude Code 源代码分析，请以最新版本为准。
+
 ## 42.1 引言
 
 Claude Code 的提示建议服务（Prompt Suggestion Service）是一个智能预测系统，能够在每次对话轮次结束后，预测用户可能输入的下一步内容。这种 AI 驱动的建议机制旨在提升交互效率，减少用户思考下一步操作的时间。
@@ -96,7 +98,7 @@ flowchart TB
 
 ### 42.2.1 启用条件检查
 
-启用判断逻辑位于 `promptSuggestion.ts` (第 37-93 行)：
+启用判断逻辑位于 `promptSuggestion.ts`（shouldEnablePromptSuggestion 函数区域）：
 
 ```typescript
 export function shouldEnablePromptSuggestion(): boolean {
@@ -147,7 +149,7 @@ export function shouldEnablePromptSuggestion(): boolean {
 
 ### 42.2.2 抑制条件检查
 
-即使服务已启用，特定状态会抑制建议生成。抑制判断定义在第 107-119 行：
+即使服务已启用，特定状态会抑制建议生成。抑制判断定义在 getSuggestionSuppressReason 函数区域：
 
 ```typescript
 export function getSuggestionSuppressReason(appState: AppState): string | null {
@@ -179,7 +181,7 @@ export function getSuggestionSuppressReason(appState: AppState): string | null {
 
 建议生成使用 Forked Agent 机制，这是 Claude Code 的子 Agent 执行框架。核心优势是复用主线程的 Prompt Cache，避免重复处理系统提示和工具定义。
 
-CacheSafeParams 类型定义（`forkedAgent.ts` 第 57-68 行）：
+CacheSafeParams 类型定义（`forkedAgent.ts` 类型定义区域）：
 
 ```typescript
 export type CacheSafeParams = {
@@ -196,7 +198,7 @@ export type CacheSafeParams = {
 }
 ```
 
-CacheSafeParams 在每次主线程采样完成后保存（`stopHooks.ts` 第 96-98 行）：
+CacheSafeParams 在每次主线程采样完成后保存（`stopHooks.ts` 保存区域）：
 
 ```typescript
 if (querySource === 'repl_main_thread' || querySource === 'sdk') {
@@ -206,7 +208,7 @@ if (querySource === 'repl_main_thread' || querySource === 'sdk') {
 
 ### 42.3.2 建议提示模板
 
-建议生成使用专用的提示模板，引导模型预测用户意图。模板定义在第 258-287 行：
+建议提示使用专用的提示模板，引导模型预测用户意图。模板定义在 SUGGESTION_PROMPT 常量区域：
 
 ```typescript
 const SUGGESTION_PROMPT = `[SUGGESTION MODE: Suggest what the user might naturally type next into Claude Code.]
@@ -250,7 +252,7 @@ Reply with ONLY the suggestion, no quotes or explanation.`
 
 ### 42.3.3 生成流程实现
 
-核心生成函数 `generateSuggestion()` 位于第 294-352 行：
+核心生成函数 `generateSuggestion()` 位于生成流程区域：
 
 ```typescript
 export async function generateSuggestion(
@@ -311,7 +313,7 @@ export async function generateSuggestion(
 
 ### 42.3.4 统一生成入口
 
-`tryGenerateSuggestion()` 是共享的生成入口，同时服务于 CLI TUI 和 SDK 推送路径（第 125-182 行）：
+`tryGenerateSuggestion()` 是共享的生成入口（统一生成入口区域）：
 
 ```typescript
 export async function tryGenerateSuggestion(
@@ -434,7 +436,7 @@ const augmentedContext: REPLHookContext = {
 
 ### 42.5.1 风格匹配策略
 
-提示模板明确要求匹配用户风格（第 285 行）：
+提示模板明确要求匹配用户风格（Format 配置区域）：
 
 ```typescript
 Format: 2-12 words, match the user's style. Or nothing.
@@ -450,7 +452,7 @@ Format: 2-12 words, match the user's style. Or nothing.
 
 ### 42.5.2 常用命令学习
 
-过滤器包含用户常用命令的例外列表（第 403-424 行）：
+过滤器包含用户常用命令的例外列表（ALLOWED_SINGLE_WORDS 常量区域）：
 
 ```typescript
 const ALLOWED_SINGLE_WORDS = new Set([
@@ -471,7 +473,7 @@ const ALLOWED_SINGLE_WORDS = new Set([
 
 ### 42.5.3 分析数据收集
 
-每次建议交互都记录详细的指标数据（第 462-497 行）：
+每次建议交互都记录详细的指标数据（logSuggestionOutcome 函数区域）：
 
 ```typescript
 export function logSuggestionOutcome(
@@ -515,7 +517,7 @@ export function logSuggestionOutcome(
 
 ### 42.5.4 过滤器数据分析
 
-所有被过滤的建议都记录原因（第 499-523 行）：
+所有被过滤的建议都记录原因（logSuggestionSuppressed 函数区域）：
 
 ```typescript
 export function logSuggestionSuppressed(
@@ -562,7 +564,7 @@ generationRequestId: string | null  // 用于 RL 数据集 joins
 
 ### 42.6.1 过滤器设计理念
 
-过滤系统确保建议符合用户习惯而非 AI 视角。核心过滤器定义在第 354-456 行：
+过滤系统确保建议符合用户习惯而非 AI 视角。核心过滤器定义在 shouldFilterSuggestion 函数区域：
 
 ```typescript
 export function shouldFilterSuggestion(
@@ -682,7 +684,7 @@ function getOverlayPath(id: string): string {
 }
 ```
 
-文件写入时的 Copy-on-Write 逻辑（第 528-541 行）：
+文件写入时的 Copy-on-Write 逻辑（写入重定向区域）：
 
 ```typescript
 if (isWriteTool) {
@@ -723,7 +725,7 @@ type CompletionBoundary =
   | { type: 'complete'; completedAt: number; outputTokens: number }
 ```
 
-边界触发逻辑（第 461-494 行）：
+边界触发逻辑（边界控制区域）：
 
 ```typescript
 // 文件编辑边界：需要权限确认
@@ -786,7 +788,7 @@ const augmentedContext: REPLHookContext = {
 
 ### 42.8.1 AppState 状态结构
 
-提示建议状态存储在 AppState 中（`AppStateStore.ts` 第 385-391 行）：
+提示建议状态存储在 AppState 中（`AppStateStore.ts` promptSuggestion 字段区域）：
 
 ```typescript
 promptSuggestion: {
@@ -851,7 +853,7 @@ export function usePromptSuggestion({
 
 ### 42.8.3 PromptInput 组件集成
 
-PromptInput 组件负责建议的显示和交互（`PromptInput.tsx` 第 1005-1082 行）：
+PromptInput 组件负责建议的显示和交互（`PromptInput.tsx` 建议接受判断区域）：
 
 ```typescript
 // 建议接受判断
@@ -879,7 +881,7 @@ if (inputMatchesSuggestion && suggestionText && !hasImages && !state.viewingAgen
 }
 ```
 
-建议显示作为 placeholder（第 2014 行）：
+建议显示作为 placeholder（placeholder 显示区域）：
 
 ```typescript
 const placeholder = showPromptSuggestion && promptSuggestion
@@ -928,7 +930,7 @@ logEvent('tengu_prompt_suggestion', {
 
 ### 42.9.1 Stop Hooks 集成
 
-提示建议在 Stop Hooks 中触发执行（`stopHooks.ts` 第 53 行引入）：
+提示建议在 Stop Hooks 中触发执行（`stopHooks.ts` 引入区域）：
 
 ```typescript
 import { executePromptSuggestion } from '../services/PromptSuggestion/promptSuggestion.js'
@@ -953,7 +955,7 @@ if (querySource === 'repl_main_thread' || querySource === 'sdk') {
 
 ### 42.9.2 执行函数实现
 
-`executePromptSuggestion()` 是 CLI TUI 的执行入口（第 184-237 行）：
+`executePromptSuggestion()` 是 CLI TUI 的执行入口（执行函数实现区域）：
 
 ```typescript
 export async function executePromptSuggestion(

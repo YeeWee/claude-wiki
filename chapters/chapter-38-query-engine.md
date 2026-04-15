@@ -15,7 +15,7 @@ QueryEngine 的设计目标是：
 
 ### 38.2.1 配置类型定义
 
-QueryEngineConfig 定义了引擎的全部配置选项（第130-173行）：
+QueryEngineConfig 定义了引擎的全部配置选项：
 
 ```typescript
 export type QueryEngineConfig = {
@@ -110,7 +110,7 @@ classDiagram
 
 ### 38.2.3 核心成员变量
 
-QueryEngine 类定义了以下关键状态变量（第185-198行）：
+QueryEngine 类定义了以下关键状态变量：
 
 ```typescript
 export class QueryEngine {
@@ -141,7 +141,7 @@ export class QueryEngine {
 
 ### 38.3.1 submitMessage 方法签名
 
-`submitMessage()` 是 QueryEngine 的核心方法，它是一个异步生成器，逐步 yield 处理后的 SDK 消息（第209-212行）：
+`submitMessage()` 是 QueryEngine 的核心方法，它是一个异步生成器：
 
 ```typescript
 async *submitMessage(
@@ -152,7 +152,7 @@ async *submitMessage(
 
 ### 38.3.2 消息处理主循环
 
-消息处理的核心是遍历 `query()` 函数返回的消息流（第675-1049行）：
+消息处理的核心是遍历 `query()` 函数返回的消息流：
 
 ```typescript
 for await (const message of query({
@@ -182,7 +182,7 @@ for await (const message of query({
 
 ### 38.3.3 使用量追踪机制
 
-QueryEngine 实现了精细的使用量追踪（第658-669行初始化，第789-816行更新）：
+QueryEngine 实现了精细的使用量追踪：
 
 ```typescript
 // 初始化
@@ -213,7 +213,7 @@ if (message.event.type === 'message_stop') {
 
 ### 38.3.4 权限拒绝追踪
 
-QueryEngine 包装 `canUseTool` 函数以追踪权限拒绝（第244-271行）：
+QueryEngine 包装 `canUseTool` 函数以追踪权限拒绝：
 
 ```typescript
 const wrappedCanUseTool: CanUseToolFn = async (
@@ -234,7 +234,7 @@ const wrappedCanUseTool: CanUseToolFn = async (
 
 ### 38.3.5 消息持久化策略
 
-QueryEngine 实现分层级的消息持久化（第436-463行）：
+QueryEngine 实现分层级的消息持久化：
 
 ```typescript
 if (persistSession && messagesFromUserInput.length > 0) {
@@ -257,7 +257,7 @@ if (persistSession && messagesFromUserInput.length > 0) {
 
 ### 38.4.1 ProcessUserInputContext 构建
 
-QueryEngine 构建完整的工具执行上下文（第335-395行）：
+QueryEngine 构建完整的工具执行上下文：
 
 ```typescript
 let processUserInputContext: ProcessUserInputContext = {
@@ -309,7 +309,7 @@ let processUserInputContext: ProcessUserInputContext = {
 
 ### 38.4.2 系统提示构建
 
-系统提示由 `fetchSystemPromptParts()` 构建（第288-300行）：
+系统提示由 `fetchSystemPromptParts()` 构建：
 
 ```typescript
 const {
@@ -335,7 +335,7 @@ const systemPrompt = asSystemPrompt([
 
 ### 38.4.3 技能与插件加载
 
-工具执行前加载技能和插件（第529-538行）：
+工具执行前加载技能和插件：
 
 ```typescript
 const [skills, { enabled: enabledPlugins }] = await Promise.all([
@@ -358,7 +358,7 @@ yield buildSystemInitMessage({
 
 ### 38.4.4 流式消息输出
 
-QueryEngine 支持流式输出（第818-826行）：
+QueryEngine 支持流式输出：
 
 ```typescript
 if (includePartialMessages) {
@@ -376,7 +376,7 @@ if (includePartialMessages) {
 
 ### 38.4.5 Compaction 协调
 
-Compact Boundary 处理（第697-715行）：
+Compact Boundary 处理：
 
 ```typescript
 if (
@@ -394,7 +394,7 @@ if (
 }
 ```
 
-Compact 后释放旧消息（第926-933行）：
+Compact 后释放旧消息：
 
 ```typescript
 const mutableBoundaryIdx = this.mutableMessages.length - 1
@@ -405,7 +405,7 @@ if (mutableBoundaryIdx > 0) {
 
 ### 38.4.6 Snip Replay 机制
 
-通过 feature flag `HISTORY_SNIP` 控制的历史剪裁（第905-915行）：
+通过 feature flag `HISTORY_SNIP` 控制的历史剪裁：
 
 ```typescript
 const snipResult = this.config.snipReplay?.(message, this.mutableMessages)
@@ -422,7 +422,7 @@ if (snipResult !== undefined) {
 
 ## 38.5 公共 API 方法
 
-QueryEngine 提供以下公共方法（第1158-1177行）：
+QueryEngine 提供以下公共方法：
 
 | 方法 | 返回类型 | 用途 |
 |------|---------|------|
@@ -445,7 +445,7 @@ getMessages(): readonly Message[] {
 
 ## 38.6 便捷函数：ask()
 
-`ask()` 是 QueryEngine 的便捷封装，用于一次性查询（第1186-1295行）：
+`ask()` 是 QueryEngine 的便捷封装，用于一次性查询：
 
 ```typescript
 export async function* ask({

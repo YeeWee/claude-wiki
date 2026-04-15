@@ -17,7 +17,7 @@
 
 ### 8.2.1 Tool 类型接口
 
-`Tool` 类型是工具系统的核心接口，定义在 `src/Tool.ts:362-695`。它是一个泛型接口，支持输入验证、输出类型和进度类型：
+`Tool` 类型是工具系统的核心接口，定义在 `src/Tool.ts`。它是一个泛型接口，支持输入验证、输出类型和进度类型：
 
 ```typescript
 export type Tool<
@@ -31,49 +31,49 @@ export type Tool<
 
 **核心字段分析**：
 
-| 字段名 | 类型 | 说明 | 行号 |
-|--------|------|------|------|
-| `name` | `string` | 工具唯一标识名 | 456 |
-| `aliases` | `string[]?` | 工具别名（向后兼容） | 369-371 |
-| `searchHint` | `string?` | ToolSearch 关键字提示 | 374-378 |
-| `inputSchema` | `Input` | Zod 输入验证 schema | 394 |
-| `inputJSONSchema` | `ToolInputJSONSchema?` | JSON Schema 格式（MCP 工具） | 395-397 |
-| `outputSchema` | `z.ZodType?` | 输出验证 schema | 400 |
-| `maxResultSizeChars` | `number` | 结果最大字符数 | 466 |
-| `shouldDefer` | `boolean?` | 是否延迟加载 | 442 |
-| `alwaysLoad` | `boolean?` | 是否始终加载 | 449 |
-| `mcpInfo` | `object?` | MCP 服务器信息 | 455 |
-| `strict` | `boolean?` | 严格模式开关 | 472 |
+| 字段名 | 类型 | 说明 |
+|--------|------|------|
+| `name` | `string` | 工具唯一标识名 |
+| `aliases` | `string[]?` | 工具别名（向后兼容） |
+| `searchHint` | `string?` | ToolSearch 关键字提示 |
+| `inputSchema` | `Input` | Zod 输入验证 schema |
+| `inputJSONSchema` | `ToolInputJSONSchema?` | JSON Schema 格式（MCP 工具） |
+| `outputSchema` | `z.ZodType?` | 输出验证 schema |
+| `maxResultSizeChars` | `number` | 结果最大字符数 |
+| `shouldDefer` | `boolean?` | 是否延迟加载 |
+| `alwaysLoad` | `boolean?` | 是否始终加载 |
+| `mcpInfo` | `object?` | MCP 服务器信息 |
+| `strict` | `boolean?` | 严格模式开关 |
 
 **核心方法分析**：
 
-| 方法名 | 返回类型 | 说明 | 行号 |
-|--------|----------|------|------|
-| `call()` | `Promise<ToolResult<Output>>` | 执行工具 | 379-385 |
-| `description()` | `Promise<string>` | 生成工具描述 | 386-393 |
-| `prompt()` | `Promise<string>` | 生成系统提示 | 518-523 |
-| `isEnabled()` | `boolean` | 是否启用 | 403 |
-| `isConcurrencySafe()` | `boolean` | 是否可并发执行 | 402 |
-| `isReadOnly()` | `boolean` | 是否只读操作 | 404 |
-| `isDestructive()` | `boolean?` | 是否破坏性操作 | 406 |
-| `checkPermissions()` | `Promise<PermissionResult>` | 权限检查 | 500-503 |
-| `validateInput()` | `Promise<ValidationResult>` | 输入验证 | 489-492 |
-| `userFacingName()` | `string` | 用户可见名称 | 524 |
+| 方法名 | 返回类型 | 说明 |
+|--------|----------|------|
+| `call()` | `Promise<ToolResult<Output>>` | 执行工具 |
+| `description()` | `Promise<string>` | 生成工具描述 |
+| `prompt()` | `Promise<string>` | 生成系统提示 |
+| `isEnabled()` | `boolean` | 是否启用 |
+| `isConcurrencySafe()` | `boolean` | 是否可并发执行 |
+| `isReadOnly()` | `boolean` | 是否只读操作 |
+| `isDestructive()` | `boolean?` | 是否破坏性操作 |
+| `checkPermissions()` | `Promise<PermissionResult>` | 权限检查 |
+| `validateInput()` | `Promise<ValidationResult>` | 输入验证 |
+| `userFacingName()` | `string` | 用户可见名称 |
 
 **UI 渲染方法**：
 
 工具接口包含丰富的 UI 渲染方法，用于在终端中展示工具执行状态：
 
-- `renderToolUseMessage()` (605-608)：渲染工具使用消息
-- `renderToolResultMessage()` (566-580)：渲染工具结果
-- `renderToolUseProgressMessage()` (625-634)：渲染进度
-- `renderToolUseRejectedMessage()` (641-652)：渲染拒绝消息
-- `renderToolUseErrorMessage()` (659-667)：渲染错误消息
-- `renderGroupedToolUse()` (678-694)：渲染并行工具组
+- `renderToolUseMessage()`：渲染工具使用消息
+- `renderToolResultMessage()`：渲染工具结果
+- `renderToolUseProgressMessage()`：渲染进度
+- `renderToolUseRejectedMessage()`：渲染拒绝消息
+- `renderToolUseErrorMessage()`：渲染错误消息
+- `renderGroupedToolUse()`：渲染并行工具组
 
 ### 8.2.2 Tools 类型
 
-`Tools` 类型是一个不可变数组，定义在 `src/Tool.ts:700-701`：
+`Tools` 类型是一个不可变数组，定义在 `src/Tool.ts`：
 
 ```typescript
 export type Tools = readonly Tool[]
@@ -85,7 +85,7 @@ export type Tools = readonly Tool[]
 
 **toolMatchesName()** - 名称匹配（含别名）
 
-定义在 `src/Tool.ts:347-353`：
+定义在 `src/Tool.ts`：
 
 ```typescript
 export function toolMatchesName(
@@ -100,7 +100,7 @@ export function toolMatchesName(
 
 **findToolByName()** - 查找工具
 
-定义在 `src/Tool.ts:358-360`：
+定义在 `src/Tool.ts`：
 
 ```typescript
 export function findToolByName(tools: Tools, name: string): Tool | undefined {
@@ -114,7 +114,7 @@ export function findToolByName(tools: Tools, name: string): Tool | undefined {
 
 ### 8.3.1 getAllBaseTools() - 获取所有内置工具
 
-`getAllBaseTools()` 函数是内置工具的权威来源，定义在 `src/tools.ts:193-251`：
+`getAllBaseTools()` 函数是内置工具的权威来源，定义在 `src/tools.ts`：
 
 ```typescript
 export function getAllBaseTools(): Tools {
@@ -138,19 +138,19 @@ export function getAllBaseTools(): Tools {
 
 该函数使用条件展开语法 `...(condition ? [Tool] : [])` 实现动态工具加载：
 
-| 条件 | 工具 | 行号 |
-|------|------|------|
-| `hasEmbeddedSearchTools()` | GlobTool, GrepTool | 201 |
-| `process.env.USER_TYPE === 'ant'` | ConfigTool, TungstenTool | 214-215 |
-| `isTodoV2Enabled()` | TaskCreateTool 等 | 218-220 |
-| `isEnvTruthy(process.env.ENABLE_LSP_TOOL)` | LSPTool | 224 |
-| `isWorktreeModeEnabled()` | EnterWorktreeTool, ExitWorktreeTool | 225 |
-| `isAgentSwarmsEnabled()` | TeamCreateTool, TeamDeleteTool | 228-230 |
-| `isToolSearchEnabledOptimistic()` | ToolSearchTool | 249 |
+| 条件 | 工具 |
+|------|------|
+| `hasEmbeddedSearchTools()` | GlobTool, GrepTool |
+| `process.env.USER_TYPE === 'ant'` | ConfigTool, TungstenTool |
+| `isTodoV2Enabled()` | TaskCreateTool 等 |
+| `isEnvTruthy(process.env.ENABLE_LSP_TOOL)` | LSPTool |
+| `isWorktreeModeEnabled()` | EnterWorktreeTool, ExitWorktreeTool |
+| `isAgentSwarmsEnabled()` | TeamCreateTool, TeamDeleteTool |
+| `isToolSearchEnabledOptimistic()` | ToolSearchTool |
 
 ### 8.3.2 getTools() - 获取可用工具
 
-`getTools()` 函数根据权限上下文返回可用工具，定义在 `src/tools.ts:271-327`：
+`getTools()` 函数根据权限上下文返回可用工具，定义在 `src/tools.ts`：
 
 ```typescript
 export const getTools = (permissionContext: ToolPermissionContext): Tools => {
@@ -181,7 +181,7 @@ export const getTools = (permissionContext: ToolPermissionContext): Tools => {
 
 ### 8.3.3 assembleToolPool() - 组合工具池
 
-`assembleToolPool()` 函数合并内置工具和 MCP 工具，定义在 `src/tools.ts:345-367`：
+`assembleToolPool()` 函数合并内置工具和 MCP 工具，定义在 `src/tools.ts`：
 
 ```typescript
 export function assembleToolPool(
@@ -208,7 +208,7 @@ export function assembleToolPool(
 
 ### 8.3.4 filterToolsByDenyRules() - 权限过滤
 
-定义在 `src/tools.ts:262-269`：
+定义在 `src/tools.ts`：
 
 ```typescript
 export function filterToolsByDenyRules<
@@ -308,7 +308,7 @@ type DefaultableToolKeys =
 import { AgentTool } from './tools/AgentTool/AgentTool.js'
 import { SkillTool } from './tools/SkillTool/SkillTool.js'
 import { BashTool } from './tools/BashTool/BashTool.js'
-// ... 第 3-13 行
+// ... 更多静态导入
 ```
 
 **条件导入**（动态加载）：
@@ -317,36 +317,36 @@ import { BashTool } from './tools/BashTool/BashTool.js'
 const REPLTool =
   process.env.USER_TYPE === 'ant'
     ? require('./tools/REPLTool/REPLTool.js').REPLTool
-    : null  // 第 16-19 行
+    : null
 
 const SleepTool =
   feature('PROACTIVE') || feature('KAIROS')
     ? require('./tools/SleepTool/SleepTool.js').SleepTool
-    : null  // 第 25-28 行
+    : null
 ```
 
 ### 8.5.2 Feature Flag 控制
 
 多个工具通过 `feature()` 函数控制加载：
 
-| Feature | 工具 | 行号 |
-|---------|------|------|
-| `AGENT_TRIGGERS` | cronTools (CronCreate/Delete/List) | 29-35 |
-| `AGENT_TRIGGERS_REMOTE` | RemoteTriggerTool | 36-38 |
-| `MONITOR_TOOL` | MonitorTool | 39-41 |
-| `KAIROS` | SendUserFileTool, PushNotificationTool | 42-48 |
-| `OVERFLOW_TEST_TOOL` | OverflowTestTool | 107-109 |
-| `CONTEXT_COLLAPSE` | CtxInspectTool | 110-112 |
-| `TERMINAL_PANEL` | TerminalCaptureTool | 113-115 |
-| `WEB_BROWSER_TOOL` | WebBrowserTool | 117-119 |
-| `COORDINATOR_MODE` | coordinatorModeModule | 120-122 |
-| `HISTORY_SNIP` | SnipTool | 123-125 |
-| `UDS_INBOX` | ListPeersTool | 126-128 |
-| `WORKFLOW_SCRIPTS` | WorkflowTool | 129-134 |
+| Feature | 工具 |
+|---------|------|
+| `AGENT_TRIGGERS` | cronTools (CronCreate/Delete/List) |
+| `AGENT_TRIGGERS_REMOTE` | RemoteTriggerTool |
+| `MONITOR_TOOL` | MonitorTool |
+| `KAIROS` | SendUserFileTool, PushNotificationTool |
+| `OVERFLOW_TEST_TOOL` | OverflowTestTool |
+| `CONTEXT_COLLAPSE` | CtxInspectTool |
+| `TERMINAL_PANEL` | TerminalCaptureTool |
+| `WEB_BROWSER_TOOL` | WebBrowserTool |
+| `COORDINATOR_MODE` | coordinatorModeModule |
+| `HISTORY_SNIP` | SnipTool |
+| `UDS_INBOX` | ListPeersTool |
+| `WORKFLOW_SCRIPTS` | WorkflowTool |
 
 ### 8.5.3 惰性加载（避免循环依赖）
 
-某些工具使用惰性 require 破除循环依赖，定义在 `src/tools.ts:63-72`：
+某些工具使用惰性 require 破除循环依赖，定义在 `src/tools.ts`：
 
 ```typescript
 const getTeamCreateTool = () =>

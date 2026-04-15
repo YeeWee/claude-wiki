@@ -65,7 +65,7 @@ graph TB
 
 ### 17.2.1 工具定义
 
-SkillTool 是 Claude Code 中用于调用技能（Skills）的核心工具。定义在 `src/tools/SkillTool/SkillTool.ts:331-869`：
+SkillTool 是 Claude Code 中用于调用技能（Skills）的核心工具。定义在 `src/tools/SkillTool/SkillTool.ts`：
 
 ```typescript
 export const SkillTool: Tool<InputSchema, Output, Progress> = buildTool({
@@ -76,7 +76,7 @@ export const SkillTool: Tool<InputSchema, Output, Progress> = buildTool({
 })
 ```
 
-**输入 Schema**（第 291-298 行）：
+**输入 Schema**：
 
 ```typescript
 export const inputSchema = lazySchema(() =>
@@ -89,7 +89,7 @@ export const inputSchema = lazySchema(() =>
 )
 ```
 
-**输出 Schema**（第 301-326 行）支持两种模式：
+**输出 Schema** 支持两种模式：
 
 | 模式 | 字段 | 说明 |
 |------|------|------|
@@ -98,7 +98,7 @@ export const inputSchema = lazySchema(() =>
 
 ### 17.2.2 技能发现与验证
 
-SkillTool 通过 `getAllCommands()` 函数获取所有可用技能（第 81-94 行）：
+SkillTool 通过 `getAllCommands()` 函数获取所有可用技能：
 
 ```typescript
 async function getAllCommands(context: ToolUseContext): Promise<Command[]> {
@@ -123,7 +123,7 @@ async function getAllCommands(context: ToolUseContext): Promise<Command[]> {
 | plugin | 插件提供的技能 | 插件仓库 |
 | mcp | MCP 服务器提供的技能 | MCP 配置 |
 
-**输入验证**（第 354-430 行）包含多级检查：
+**输入验证** 包含多级检查：
 
 ```typescript
 async validateInput({ skill }, context): Promise<ValidationResult> {
@@ -155,7 +155,7 @@ async validateInput({ skill }, context): Promise<ValidationResult> {
 
 ### 17.2.3 权限控制机制
 
-SkillTool 实现了细粒度的权限控制（第 432-578 行），采用三层策略：
+SkillTool 实现了细粒度的权限控制，采用三层策略：
 
 **第一层：拒绝规则检查**
 
@@ -189,7 +189,7 @@ for (const [ruleContent, rule] of allowRules.entries()) {
 
 **第三层：安全属性白名单**
 
-定义在 `src/tools/SkillTool/SkillTool.ts:875-908`：
+定义在 `src/tools/SkillTool/SkillTool.ts`：
 
 ```typescript
 const SAFE_SKILL_PROPERTIES = new Set([
@@ -210,7 +210,7 @@ const SAFE_SKILL_PROPERTIES = new Set([
 
 SkillTool 支持两种执行模式：
 
-**Inline 模式**（第 634-840 行）
+**Inline 模式**
 
 技能内容直接注入当前对话：
 
@@ -262,7 +262,7 @@ return {
 }
 ```
 
-**Forked 模式**（第 122-288 行）
+**Forked 模式**
 
 技能在独立子 Agent 中执行：
 
@@ -311,7 +311,7 @@ async function executeForkedSkill(
 
 ### 17.2.5 Prompt 生成
 
-SkillTool 的 Prompt 动态生成技能列表，定义在 `src/tools/SkillTool/prompt.ts:173-196`：
+SkillTool 的 Prompt 动态生成技能列表，定义在 `src/tools/SkillTool/prompt.ts`：
 
 ```typescript
 export const getPrompt = memoize(async (_cwd: string): Promise<string> => {
@@ -339,7 +339,7 @@ Important:
 })
 ```
 
-技能列表通过 `formatCommandsWithinBudget()` 函数（第 70-171 行）生成，受字符预算限制（1%上下文窗口）：
+技能列表通过 `formatCommandsWithinBudget()` 函数生成，受字符预算限制（1%上下文窗口）：
 
 ```typescript
 export const SKILL_BUDGET_CONTEXT_PERCENT = 0.01
@@ -353,7 +353,7 @@ export const DEFAULT_CHAR_BUDGET = 8_000 // Fallback: 1% of 200k × 4
 
 ### 17.3.1 工具定义
 
-MCPTool 是 Claude Code 与 MCP（Model Context Protocol）服务器交互的桥梁。定义在 `src/tools/MCPTool/MCPTool.ts:27-77`：
+MCPTool 是 Claude Code 与 MCP（Model Context Protocol）服务器交互的桥梁。定义在 `src/tools/MCPTool/MCPTool.ts`：
 
 ```typescript
 export const MCPTool = buildTool({
@@ -393,7 +393,7 @@ export const MCPTool = buildTool({
 
 ### 17.3.2 Schema 设计
 
-MCPTool 使用 `passthrough()` Schema（第 14 行）：
+MCPTool 使用 `passthrough()` Schema：
 
 ```typescript
 export const inputSchema = lazySchema(() => z.object({}).passthrough())
@@ -450,7 +450,7 @@ MCP 服务器执行工具
 
 ### 17.4.1 工具定义
 
-ConfigTool 提供动态配置管理能力。定义在 `src/tools/ConfigTool/ConfigTool.ts:67-434`：
+ConfigTool 提供动态配置管理能力。定义在 `src/tools/ConfigTool/ConfigTool.ts`：
 
 ```typescript
 export const ConfigTool = buildTool({
@@ -478,7 +478,7 @@ export const ConfigTool = buildTool({
 
 ### 17.4.2 输入输出 Schema
 
-**输入 Schema**（第 36-48 行）：
+**输入 Schema**：
 
 ```typescript
 const inputSchema = lazySchema(() =>
@@ -494,7 +494,7 @@ const inputSchema = lazySchema(() =>
 )
 ```
 
-**输出 Schema**（第 51-62 行）：
+**输出 Schema**：
 
 ```typescript
 const outputSchema = lazySchema(() =>
@@ -512,7 +512,7 @@ const outputSchema = lazySchema(() =>
 
 ### 17.4.3 支持的设置项
 
-定义在 `src/tools/ConfigTool/supportedSettings.ts:29-186`：
+定义在 `src/tools/ConfigTool/supportedSettings.ts`：
 
 **全局设置**（存储在 `~/.claude.json`）：
 
@@ -540,9 +540,9 @@ const outputSchema = lazySchema(() =>
 
 ### 17.4.4 执行逻辑
 
-ConfigTool 的 `call()` 方法（第 111-411 行）实现 GET/SET 操作：
+ConfigTool 的 `call()` 方法实现 GET/SET 操作：
 
-**GET 操作**（第 136-144 行）：
+**GET 操作**：
 
 ```typescript
 if (value === undefined) {
@@ -604,7 +604,7 @@ if (config.appStateKey) {
 
 ### 17.4.5 权限控制
 
-ConfigTool 的权限检查（第 98-107 行）：
+ConfigTool 的权限检查：
 
 ```typescript
 async checkPermissions(input: Input) {
@@ -624,7 +624,7 @@ async checkPermissions(input: Input) {
 
 ### 17.4.6 Prompt 生成
 
-Prompt 从设置注册表动态生成（`src/tools/ConfigTool/prompt.ts:14-77`）：
+Prompt 从设置注册表动态生成（`src/tools/ConfigTool/prompt.ts`）：
 
 ```typescript
 export function generatePrompt(): string {
@@ -681,7 +681,7 @@ ${projectSettings.join('\n')}
 
 ### 17.5.1 工具定义
 
-AskUserQuestionTool 实现多选项用户问答交互。定义在 `src/tools/AskUserQuestionTool/AskUserQuestionTool.tsx:109-245`：
+AskUserQuestionTool 实现多选项用户问答交互。定义在 `src/tools/AskUserQuestionTool/AskUserQuestionTool.tsx`：
 
 ```typescript
 export const AskUserQuestionTool: Tool<InputSchema, Output> = buildTool({
@@ -720,7 +720,7 @@ export const AskUserQuestionTool: Tool<InputSchema, Output> = buildTool({
 
 ### 17.5.2 输入 Schema 设计
 
-AskUserQuestionTool 的 Schema 设计精细（第 14-67 行）：
+AskUserQuestionTool 的 Schema 设计精细：
 
 **问题选项 Schema**：
 
@@ -743,7 +743,7 @@ const questionSchema = lazySchema(() => z.object({
 }))
 ```
 
-**唯一性验证**（第 32-54 行）：
+**唯一性验证**：
 
 ```typescript
 const UNIQUENESS_REFINE = {
@@ -770,7 +770,7 @@ const UNIQUENESS_REFINE = {
 
 AskUserQuestionTool 支持 Preview 功能，用于展示可视化内容：
 
-定义在 `src/tools/AskUserQuestionTool/prompt.ts:10-29`：
+定义在 `src/tools/AskUserQuestionTool/prompt.ts`：
 
 ```typescript
 export const PREVIEW_FEATURE_PROMPT = {
@@ -791,7 +791,7 @@ Preview content must be a self-contained HTML fragment (no <html>/<body> wrapper
 }
 ```
 
-**HTML 验证**（第 250-265 行）：
+**HTML 验证**：
 
 ```typescript
 function validateHtmlPreview(preview: string | undefined): string | null {
@@ -818,7 +818,7 @@ function validateHtmlPreview(preview: string | undefined): string | null {
 
 ### 17.5.4 执行逻辑
 
-AskUserQuestionTool 的执行流程简单（第 209-222 行）：
+AskUserQuestionTool 的执行流程简单：
 
 ```typescript
 async call({ questions, answers = {}, annotations }, _context) {
@@ -841,7 +841,7 @@ async call({ questions, answers = {}, annotations }, _context) {
 
 ### 17.5.5 结果格式化
 
-`mapToolResultToToolResultBlockParam()`（第 224-244 行）格式化返回：
+`mapToolResultToToolResultBlockParam()` 格式化返回：
 
 ```typescript
 mapToolResultToToolResultBlockParam({ answers, annotations }, toolUseID) {
@@ -869,7 +869,7 @@ mapToolResultToToolResultBlockParam({ answers, annotations }, toolUseID) {
 
 ### 17.5.6 Prompt 定义
 
-Prompt 定义在 `src/tools/AskUserQuestionTool/prompt.ts:32-44`：
+Prompt 定义在 `src/tools/AskUserQuestionTool/prompt.ts`：
 
 ```typescript
 export const ASK_USER_QUESTION_TOOL_PROMPT = `Use this tool when you need to ask the user questions during execution. This allows you to:
@@ -893,7 +893,7 @@ Plan mode note: In plan mode, use this tool to clarify requirements BEFORE final
 
 ### 17.6.1 Agent 工具可用性
 
-定义在 `src/constants/tools.ts:36-88`：
+定义在 `src/constants/tools.ts`：
 
 **所有 Agent 禁用的工具**：
 
@@ -966,11 +966,11 @@ export const ASYNC_AGENT_ALLOWED_TOOLS = new Set([
 
 **源文件参考**：
 
-- `src/tools/SkillTool/SkillTool.ts` (1-1109 行)
-- `src/tools/SkillTool/prompt.ts` (1-242 行)
-- `src/tools/MCPTool/MCPTool.ts` (1-77 行)
-- `src/tools/ConfigTool/ConfigTool.ts` (1-468 行)
-- `src/tools/ConfigTool/supportedSettings.ts` (1-212 行)
-- `src/tools/AskUserQuestionTool/AskUserQuestionTool.tsx` (1-266 行)
-- `src/tools/AskUserQuestionTool/prompt.ts` (1-45 行)
-- `src/constants/tools.ts` (1-113 行)
+- `src/tools/SkillTool/SkillTool.ts`
+- `src/tools/SkillTool/prompt.ts`
+- `src/tools/MCPTool/MCPTool.ts`
+- `src/tools/ConfigTool/ConfigTool.ts`
+- `src/tools/ConfigTool/supportedSettings.ts`
+- `src/tools/AskUserQuestionTool/AskUserQuestionTool.tsx`
+- `src/tools/AskUserQuestionTool/prompt.ts`
+- `src/constants/tools.ts`

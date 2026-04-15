@@ -1,5 +1,7 @@
 # 第25章：MCP服务集成
 
+> **版本说明**：本文基于 Claude Code 源代码分析，请以最新版本为准。
+
 ## 25.1 引言
 
 Model Context Protocol (MCP) 是 Anthropic 开发的开放协议，用于建立 AI 模型与外部工具、资源之间的标准化连接。Claude Code 通过 MCP 服务集成，实现了与各种外部系统（如文件系统、数据库、API服务、IDE等）的无缝交互。

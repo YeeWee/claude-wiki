@@ -71,7 +71,7 @@ flowchart TB
 
 React Reconciler是React的核心调度系统，负责将虚拟DOM树同步到宿主环境。浏览器环境中使用ReactDOM，Ink则通过`react-reconciler`包创建自定义协调器。
 
-**reconciler.ts**（第224-506行）定义了完整的协调器配置：
+**reconciler.ts** 定义了完整的协调器配置：
 
 ```typescript
 const reconciler = createReconciler<
@@ -97,17 +97,17 @@ const reconciler = createReconciler<
 
 关键配置方法：
 
-| 方法 | 作用 | 行号 |
-|------|------|------|
-| `createInstance` | 创建DOM元素节点 | 331-359 |
-| `createTextInstance` | 创建文本节点 | 360-372 |
-| `appendChild` | 添加子节点 | 392 |
-| `commitUpdate` | 更新节点属性 | 426-459 |
-| `resetAfterCommit` | 提交后触发布局计算 | 247-315 |
+| 方法 | 作用 |
+|------|------|
+| `createInstance` | 创建DOM元素节点 |
+| `createTextInstance` | 创建文本节点 |
+| `appendChild` | 添加子节点 |
+| `commitUpdate` | 更新节点属性 |
+| `resetAfterCommit` | 提交后触发布局计算 |
 
 ### DOM节点类型
 
-**dom.ts**（第19-28行）定义了终端DOM的节点类型：
+**dom.ts** 定义了终端DOM的节点类型：
 
 ```typescript
 export type ElementNames =
@@ -136,7 +136,7 @@ export type DOMElement = {
 
 ### 节点创建流程
 
-**dom.ts**（第110-132行）`createNode`函数：
+**dom.ts** 的 `createNode` 函数：
 
 ```typescript
 export const createNode = (nodeName: ElementNames): DOMElement => {
@@ -177,7 +177,7 @@ Yoga是Facebook开发的跨平台Flexbox布局引擎，使用C++实现并通过W
 
 ### LayoutNode接口抽象
 
-**layout/node.ts**（第93-152行）定义了布局节点的抽象接口：
+**layout/node.ts** 定义了布局节点的抽象接口：
 
 ```typescript
 export type LayoutNode = {
@@ -208,7 +208,7 @@ export type LayoutNode = {
 
 ### Yoga适配器实现
 
-**layout/yoga.ts**（第54-297行）实现`YogaLayoutNode`适配器：
+**layout/yoga.ts** 实现`YogaLayoutNode`适配器：
 
 ```typescript
 export class YogaLayoutNode implements LayoutNode {
@@ -250,7 +250,7 @@ export class YogaLayoutNode implements LayoutNode {
 
 ### 布局触发时机
 
-**ink.tsx**（第238-258行）在React提交阶段触发布局计算：
+**ink.tsx** 在React提交阶段触发布局计算：
 
 ```typescript
 this.rootNode.onComputeLayout = () => {
@@ -274,7 +274,7 @@ this.rootNode.onComputeLayout = () => {
 
 ### 样式系统
 
-**styles.ts**（第55-200行）定义了完整的Flexbox样式属性：
+**styles.ts** 定义了完整的Flexbox样式属性：
 
 ```typescript
 export type Styles = {
@@ -384,7 +384,7 @@ resetAfterCommit(rootNode) {
 
 ### 属性更新机制
 
-**reconciler.ts**（第426-459行）`commitUpdate`方法：
+**reconciler.ts** 的 `commitUpdate` 方法：
 
 ```typescript
 commitUpdate(
@@ -423,7 +423,7 @@ commitUpdate(
 
 ### Dirty标记传播
 
-**dom.ts**（第134-153行）子节点操作自动标记dirty：
+**dom.ts** 子节点操作自动标记dirty：
 
 ```typescript
 export const appendChildNode = (
@@ -481,7 +481,7 @@ export type Screen = Size & {
 
 ### Cell打包格式
 
-**screen.ts**（第332-348行）单元格数据布局：
+**screen.ts** 的单元格数据打包函数：
 
 ```typescript
 // 每个单元格2个Int32：
@@ -508,14 +508,14 @@ function packWord1(
 
 ### 双缓冲机制
 
-**ink.tsx**（第96-97行）维护前后帧缓冲：
+**ink.tsx** 维护前后帧缓冲：
 
 ```typescript
 private frontFrame: Frame   // 当前显示帧
 private backFrame: Frame    // 下一帧正在构建
 ```
 
-**renderer.ts**（第38-48行）渲染入口：
+**renderer.ts** 渲染入口：
 
 ```typescript
 return options => {
@@ -535,7 +535,7 @@ return options => {
 
 ### Output操作队列
 
-**output.ts**（第62-169行）定义了渲染操作类型：
+**output.ts** 定义了渲染操作类型：
 
 ```typescript
 export type Operation =
@@ -572,7 +572,7 @@ type ShiftOperation = {
 }
 ```
 
-**Output类**（第170-206行）核心方法：
+**Output类** 核心方法：
 
 ```typescript
 export default class Output {
@@ -611,7 +611,7 @@ export default class Output {
 
 ### Blit优化（块传输）
 
-**screen.ts**（第858-901行）`blitRegion`实现：
+**screen.ts** 的 `blitRegion` 实现：
 
 ```typescript
 export function blitRegion(
@@ -674,7 +674,7 @@ export function diffEach(
 
 ### ANSI补丁生成
 
-**log-update.ts**（第123-300行）核心渲染方法：
+**log-update.ts** 核心渲染方法：
 
 ```typescript
 render(
@@ -711,7 +711,7 @@ render(
 
 ### 补丁优化器
 
-**optimizer.ts**（第16-93行）应用多种优化规则减少终端写入：
+**optimizer.ts** 应用多种优化规则减少终端写入：
 
 ```typescript
 export function optimize(diff: Diff): Diff {

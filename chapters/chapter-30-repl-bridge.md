@@ -1,5 +1,7 @@
 # 第30章：REPL Bridge - 远程控制集成
 
+> **版本说明**：本文基于 Claude Code 源代码分析，请以最新版本为准。
+
 ## 30.1 引言
 
 REPL Bridge 是 Claude Code 实现远程控制功能的核心组件。它允许用户通过 `claude.ai` 网站远程控制本地运行的 Claude Code CLI 会话，实现跨设备协作和远程访问。

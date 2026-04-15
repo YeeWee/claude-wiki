@@ -22,7 +22,7 @@
 文件开头的预处理代码在模块加载时立即执行：
 
 ```typescript
-// cli.tsx:1-26
+// cli.tsx 文件开头：环境预处理
 import { feature } from 'bun:bundle';
 
 // 修复 corepack 自动 pinning 问题
@@ -51,7 +51,7 @@ if (feature('ABLATION_BASELINE') && process.env.CLAUDE_CODE_ABLATION_BASELINE) {
 `main()` 函数的核心是**快速路径检测**——一系列条件分支，每个分支处理特定的命令模式并提前退出，避免加载完整的 CLI 模块：
 
 ```typescript
-// cli.tsx:33-42
+// cli.tsx 中的 main() 函数：快速路径检测核心
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
 
@@ -92,7 +92,7 @@ async function main(): Promise<void> {
 Bridge 模式是一个重要的远程控制功能，允许将本地机器作为远程开发环境：
 
 ```typescript
-// cli.tsx:108-162
+// cli.tsx 中的 Bridge 模式入口
 if (feature('BRIDGE_MODE') && (args[0] === 'remote-control' || args[0] === 'rc' || ...)) {
   profileCheckpoint('cli_bridge_path');
 
@@ -138,7 +138,7 @@ Bridge 模式的检查顺序体现了安全设计原则：
 Daemon 是 Claude Code 的长驻后台监管进程：
 
 ```typescript
-// cli.tsx:164-180
+// cli.tsx 中的 Daemon 模式入口
 if (feature('DAEMON') && args[0] === 'daemon') {
   profileCheckpoint('cli_daemon_path');
   enableConfigs();
@@ -157,7 +157,7 @@ Daemon 模式与 Bridge 模式的区别：
 当所有快速路径都不匹配时，进入完整的 CLI 加载：
 
 ```typescript
-// cli.tsx:287-299
+// cli.tsx 中的主 CLI 入口路径
 const { startCapturingEarlyInput } = await import('../utils/earlyInput.js');
 startCapturingEarlyInput();  // 开始捕获早期输入
 
@@ -181,7 +181,7 @@ profileCheckpoint('cli_after_main_complete');
 `init` 函数使用 `memoize` 包装，确保只执行一次：
 
 ```typescript
-// init.ts:57-238
+// init.ts 中的 init 函数：核心初始化序列
 export const init = memoize(async (): Promise<void> => {
   const initStartTime = Date.now();
   profileCheckpoint('init_function_start');
@@ -275,7 +275,7 @@ export const init = memoize(async (): Promise<void> => {
 `enableConfigs()` 是配置系统的核心入口：
 
 ```typescript
-// init.ts:62-69
+// init.ts 中的配置系统启用
 enableConfigs();
 logForDiagnosticsNoPII('info', 'init_configs_enabled', {
   duration_ms: Date.now() - configsStart,
@@ -286,7 +286,7 @@ profileCheckpoint('init_configs_enabled');
 配置加载后，应用环境变量：
 
 ```typescript
-// init.ts:72-84
+// init.ts 中的环境变量应用
 applySafeConfigEnvironmentVariables();  // 安全环境变量（信任对话框之前）
 applyExtraCACertsFromConfig();  // CA 证书（必须在 TLS 连接之前）
 ```
@@ -298,7 +298,7 @@ applyExtraCACertsFromConfig();  // CA 证书（必须在 TLS 连接之前）
 网络配置包括 mTLS 和代理两部分：
 
 ```typescript
-// init.ts:134-159
+// init.ts 中的网络配置序列
 configureGlobalMTLS();  // 全局 mTLS 设置
 configureGlobalAgents();  // 全局 HTTP agents（代理和 mTLS）
 preconnectAnthropicApi();  // 预连接 Anthropic API
@@ -311,7 +311,7 @@ preconnectAnthropicApi();  // 预连接 Anthropic API
 遥测初始化延迟到信任对话框之后：
 
 ```typescript
-// init.ts:247-286
+// init.ts 中的遥测初始化函数
 export function initializeTelemetryAfterTrust(): void {
   if (isEligibleForRemoteManagedSettings()) {
     // SDK/headless 模式：立即初始化
@@ -333,7 +333,7 @@ export function initializeTelemetryAfterTrust(): void {
 遥测模块使用延迟加载策略，避免在启动时加载 ~400KB 的 OpenTelemetry + protobuf 模块：
 
 ```typescript
-// init.ts:305-340
+// init.ts 中的遥测状态设置
 async function setMeterState(): Promise<void> {
   const { initializeTelemetry } = await import('../utils/telemetry/instrumentation.js');
   const meter = await initializeTelemetry();
@@ -364,7 +364,7 @@ async function setMeterState(): Promise<void> {
 文件开头展示了精心设计的导入策略：
 
 ```typescript
-// main.tsx:1-20
+// main.tsx 文件开头：预读取启动
 import { profileCheckpoint, profileReport } from './utils/startupProfiler.js';
 profileCheckpoint('main_tsx_entry');
 
@@ -384,7 +384,7 @@ startKeychainPrefetch();  // 启动 macOS keychain 预读取
 条件导入使用 `require()` 配合 `feature()` 门控：
 
 ```typescript
-// main.tsx:68-81
+// main.tsx 中的条件导入
 const getTeammateUtils = () => require('./utils/teammate.js');
 const coordinatorModeModule = feature('COORDINATOR_MODE')
   ? require('./coordinator/coordinatorMode.js')
@@ -401,7 +401,7 @@ const assistantModule = feature('KAIROS')
 ### 2.4.3 main 函数结构
 
 ```typescript
-// main.tsx:585-607
+// main.tsx 中的 main() 函数入口
 export async function main() {
   profileCheckpoint('main_function_start');
 
@@ -429,7 +429,7 @@ export async function main() {
 深度链接（cc:// 协议）的处理在 main 函数早期执行：
 
 ```typescript
-// main.tsx:612-642
+// main.tsx 中的深度链接处理
 if (feature('DIRECT_CONNECT')) {
   const rawCliArgs = process.argv.slice(2);
   const ccIdx = rawCliArgs.findIndex(a => a.startsWith('cc://') || a.startsWith('cc+unix://'));
@@ -455,7 +455,7 @@ if (feature('DIRECT_CONNECT')) {
 `startDeferredPrefetches()` 在 REPL 渲染后执行，避免阻塞首次渲染：
 
 ```typescript
-// main.tsx:388-431
+// main.tsx 中的延迟预取函数
 export function startDeferredPrefetches(): void {
   // --bare 或性能测试模式：跳过所有预取
   if (isEnvTruthy(process.env.CLAUDE_CODE_EXIT_AFTER_FIRST_RENDER) || isBareMode()) {

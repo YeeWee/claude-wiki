@@ -1,5 +1,7 @@
 # 第 48 章：可扩展性设计
 
+> 本章基于 Claude Code 源代码分析，请以最新版本为准。
+
 ## 48.1 引言
 
 Claude Code 的可扩展性设计是其作为"agentic coding tool"的核心优势。通过统一的扩展架构，用户可以从多个维度增强 CLI 的能力：
@@ -130,7 +132,7 @@ export type Tool<
 使用 `buildTool()` 工厂函数简化工具定义：
 
 ```typescript
-// src/Tool.ts:783-792
+// src/Tool.ts - buildTool 工厂函数区域
 export function buildTool<D extends AnyToolDef>(def: D): BuiltTool<D> {
   return {
     ...TOOL_DEFAULTS,  // 应用安全默认值
@@ -143,7 +145,7 @@ export function buildTool<D extends AnyToolDef>(def: D): BuiltTool<D> {
 **安全默认值配置**：
 
 ```typescript
-// src/Tool.ts:757-769
+// src/Tool.ts - TOOL_DEFAULTS 安全默认值区域
 const TOOL_DEFAULTS = {
   isEnabled: () => true,                        // 默认启用
   isConcurrencySafe: (_input) => false,         // 默认不安全（fail-close）
@@ -215,7 +217,7 @@ export const MyCustomTool = buildTool(MyCustomToolDef)
 新工具需要在 `src/tools.ts` 中注册：
 
 ```typescript
-// src/tools.ts:193-251
+// src/tools.ts - getAllBaseTools 函数区域
 export function getAllBaseTools(): Tools {
   return [
     AgentTool,
@@ -397,7 +399,7 @@ const myJSXCommand: Command = {
 命令在 `src/commands.ts` 中注册：
 
 ```typescript
-// src/commands.ts:258-346
+// src/commands.ts - COMMANDS 命令注册区域
 const COMMANDS = memoize((): Command[] => [
   addDir,
   config,
@@ -585,7 +587,7 @@ disable-model-invocation: false
 技能按优先级从多个来源加载：
 
 ```typescript
-// src/skills/loadSkillsDir.ts:679-714
+// src/skills/loadSkillsDir.ts - 技能加载区域
 const [
   managedSkills,      // 企业策略目录
   userSkills,         // ~/.claude/skills
@@ -628,7 +630,7 @@ paths:
 当用户操作匹配路径时，技能自动激活：
 
 ```typescript
-// src/skills/loadSkillsDir.ts:997-1058
+// src/skills/loadSkillsDir.ts - activateConditionalSkillsForPaths 函数区域
 export function activateConditionalSkillsForPaths(
   filePaths: string[],
   cwd: string,
@@ -739,7 +741,7 @@ MCP 配置支持环境变量替换：
 MCP 服务器可暴露三种能力：
 
 ```typescript
-// src/services/mcp/client.ts:2172-2192
+// src/services/mcp/client.ts - MCP 能力获取区域
 const [tools, commands, resources] = await Promise.all([
   fetchToolsForClient(client),      // 工具列表
   fetchCommandsForClient(client),    // 提示（命令）
@@ -777,7 +779,7 @@ export function buildMcpToolName(serverName: string, toolName: string): string {
 MCP 配置按来源优先级合并：
 
 ```typescript
-// src/services/mcp/config.ts:223-266
+// src/services/mcp/config.ts - dedupPluginMcpServers 函数区域
 export function dedupPluginMcpServers(
   pluginServers: Record<string, ScopedMcpServerConfig>,
   manualServers: Record<string, ScopedMcpServerConfig>,

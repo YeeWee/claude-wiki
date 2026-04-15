@@ -1,5 +1,7 @@
 # 第三十二章：Coordinator 模式
 
+> **版本说明**：本文基于 Claude Code 源代码分析，请以最新版本为准。
+
 ## 32.1 引言
 
 Coordinator 模式是 Claude Code 实现多 Agent 编排的核心机制。在该模式下，主 Agent 扮演协调者角色，负责任务分解、Worker 启动、结果综合和用户沟通；Worker Agent 执行具体的研究、实现和验证任务。这种分工协作模式使 Claude Code 能够高效处理复杂的多步骤任务。

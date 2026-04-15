@@ -44,7 +44,7 @@ Claude Code 采用了多种 React Context 设计模式：
 这是最常见的模式，以 StatsContext 为代表（`stats.tsx`）：
 
 ```typescript
-// 定义 Store 类型接口（第 5-10 行）
+// 定义 Store 类型接口
 export type StatsStore = {
   increment(name: string, value?: number): void;
   set(name: string, value: number): void;
@@ -53,10 +53,10 @@ export type StatsStore = {
   getAll(): Record<string, number>;
 };
 
-// 创建 Context（第 99 行）
+// 创建 Context
 export const StatsContext = createContext<StatsStore | null>(null);
 
-// 提供 Provider 组件（第 104-156 行）
+// 提供 Provider 组件
 export function StatsProvider({ store: externalStore, children }: Props) {
   const internalStore = useMemo(() => createStatsStore(), []);
   const store = externalStore ?? internalStore;
@@ -64,7 +64,7 @@ export function StatsProvider({ store: externalStore, children }: Props) {
   return <StatsContext.Provider value={store}>{children}</StatsContext.Provider>;
 }
 
-// 提供消费 Hook（第 157-163 行）
+// 提供消费 Hook
 export function useStats(): StatsStore {
   const store = useContext(StatsContext);
   if (!store) {
@@ -84,19 +84,19 @@ export function useStats(): StatsStore {
 StatsContext 提供了多个派生 Hook，简化特定场景的使用：
 
 ```typescript
-// 第 164-177 行：计数器 Hook
+// 计数器 Hook
 export function useCounter(name: string): (value?: number) => void {
   const store = useStats();
   return useCallback(value => store.increment(name, value), [store, name]);
 }
 
-// 第 178-191 行：仪表 Hook
+// 仪表 Hook
 export function useGauge(name: string): (value: number) => void {
   const store = useStats();
   return useCallback(value => store.set(name, value), [store, name]);
 }
 
-// 第 192-205 行：计时器 Hook
+// 计时器 Hook
 export function useTimer(name: string): (value: number) => void {
   const store = useStats();
   return useCallback(value => store.observe(name, value), [store, name]);
@@ -110,12 +110,12 @@ export function useTimer(name: string): (value: number) => void {
 OverlayContext 和 ModalContext 使用此模式检测运行环境：
 
 ```typescript
-// overlayContext.tsx 第 122-124 行
+// overlayContext.tsx 中的 Overlay 活动检测
 export function useIsOverlayActive(): boolean {
   return useAppState(s => s.activeOverlays.size > 0);
 }
 
-// modalContext.tsx 第 28-30 行
+// modalContext.tsx 中的 Modal 环境检测
 export function useIsInsideModal(): boolean {
   return useContext(ModalContext) !== null;
 }
@@ -129,7 +129,7 @@ export function useIsInsideModal(): boolean {
 
 ### 7.3.1 数据结构设计
 
-通知的基础类型定义（第 5-33 行）：
+通知的基础类型定义：
 
 ```typescript
 type Priority = 'low' | 'medium' | 'high' | 'immediate';
@@ -162,7 +162,7 @@ export type Notification = TextNotification | JSXNotification;
 
 ### 7.3.2 优先级队列实现
 
-优先级映射（第 230-235 行）：
+优先级映射：
 
 ```typescript
 const PRIORITIES: Record<Priority, number> = {
@@ -173,7 +173,7 @@ const PRIORITIES: Record<Priority, number> = {
 };
 ```
 
-获取下一个显示通知的逻辑（第 236-239 行）：
+获取下一个显示通知的逻辑：
 
 ```typescript
 export function getNext(queue: Notification[]): Notification | undefined {
@@ -188,7 +188,7 @@ export function getNext(queue: Notification[]): Notification | undefined {
 
 ### 7.3.3 折叠机制
 
-折叠机制允许相同 key 的通知合并（第 122-170 行）：
+折叠机制允许相同 key 的通知合并：
 
 ```typescript
 // 折叠到当前显示的通知
@@ -221,7 +221,7 @@ if (queueIdx !== -1) {
 
 ### 7.3.4 失效机制
 
-失效机制允许通知声明使其他通知无效（第 98-101 行，第 176-180 行）：
+失效机制允许通知声明使其他通知无效：
 
 ```typescript
 // 清理队列中被失效的通知
@@ -241,7 +241,7 @@ if (invalidatesCurrent && currentTimeoutId) {
 
 ### 7.3.5 immediate 优先级的特殊处理
 
-immediate 优先级的通知会立即显示，打断当前流程（第 80-117 行）：
+immediate 优先级的通知会立即显示，打断当前流程：
 
 ```typescript
 if (notif.priority === 'immediate') {
@@ -276,7 +276,6 @@ if (notif.priority === 'immediate') {
 通知系统使用全局 AppState Store 而非独立 Context：
 
 ```typescript
-// 第 42-43 行
 const store = useAppStateStore();
 const setAppState = useSetAppState();
 ```
@@ -300,7 +299,7 @@ notifications: {
 
 模态对话框在全屏布局中占据底部锚定的区域，其内部可用空间小于终端整体尺寸。组件需要获取准确的可用尺寸以避免溢出。
 
-Context 定义（第 22-27 行）：
+Context 定义：
 
 ```typescript
 type ModalCtx = {
@@ -312,7 +311,7 @@ type ModalCtx = {
 
 ### 7.4.2 核心功能
 
-**环境检测**（第 28-30 行）：
+**环境检测**：
 
 ```typescript
 export function useIsInsideModal(): boolean {
@@ -322,7 +321,7 @@ export function useIsInsideModal(): boolean {
 
 组件可据此决定是否渲染全宽分隔符或调整布局。
 
-**尺寸获取**（第 38-54 行）：
+**尺寸获取**：
 
 ```typescript
 export function useModalOrTerminalSize(fallback: { rows: number; columns: number }) {
@@ -333,7 +332,7 @@ export function useModalOrTerminalSize(fallback: { rows: number; columns: number
 
 此 Hook 提供优雅降级：在 Modal 内返回 Modal 尺寸，否则返回终端尺寸。
 
-**滚动控制**（第 55-57 行）：
+**滚动控制**：
 
 ```typescript
 export function useModalScrollRef() {
@@ -345,7 +344,7 @@ export function useModalScrollRef() {
 
 ### 7.4.3 使用场景
 
-根据注释（第 5-20 行），Modal Context 解决三个问题：
+Modal Context 解决三个问题：
 
 1. **分隔符抑制**：Pane 组件跳过全终端宽度的 Divider，因为 FullscreenLayout 已绘制
 2. **Select 分页尺寸**：组件根据 Modal 实际可用行数计算可见选项数
@@ -361,7 +360,7 @@ export function useModalScrollRef() {
 
 ### 7.5.2 Overlay 注册
 
-核心注册 Hook（第 38-104 行）：
+核心注册 Hook：
 
 ```typescript
 export function useRegisterOverlay(id: string, enabled = true): void {
@@ -405,7 +404,7 @@ export function useRegisterOverlay(id: string, enabled = true): void {
 
 ### 7.5.3 模态与非模态 Overlay
 
-系统区分两种 Overlay 类型（第 21 行，第 137-150 行）：
+系统区分两种 Overlay 类型：
 
 ```typescript
 const NON_MODAL_OVERLAYS = new Set(['autocomplete']);
@@ -443,7 +442,7 @@ function CancelRequestHandler() {
 
 ### 7.6.1 Store 实现
 
-核心 Store 创建函数（第 28-97 行）：
+核心 Store 创建函数：
 
 ```typescript
 export function createStatsStore(): StatsStore {
@@ -506,7 +505,7 @@ if (h.reservoir.length < RESERVOIR_SIZE) {
 
 ### 7.6.3 百分位数计算
 
-百分位数函数（第 11-19 行）：
+百分位数函数：
 
 ```typescript
 function percentile(sorted: number[], p: number): number {
@@ -520,11 +519,11 @@ function percentile(sorted: number[], p: number): number {
 }
 ```
 
-使用线性插值计算任意百分位数，导出结果时计算 p50、p95、p99（第 88-90 行）。
+使用线性插值计算任意百分位数，导出结果时计算 p50、p95、p99。
 
 ### 7.6.4 getAll 输出结构
 
-导出格式（第 77-96 行）：
+导出格式：
 
 ```typescript
 getAll() {
@@ -554,7 +553,7 @@ getAll() {
 
 ### 7.6.5 持久化机制
 
-StatsProvider 在进程退出时保存指标（第 122-135 行）：
+StatsProvider 在进程退出时保存指标：
 
 ```typescript
 useEffect(() => {
@@ -593,7 +592,7 @@ Stats 系统追踪的指标类型：
 
 ### 7.7.1 Git 状态获取
 
-getGitStatus 使用 memoize 缓存（第 36-111 行）：
+getGitStatus 使用 memoize 缓存：
 
 ```typescript
 export const getGitStatus = memoize(async (): Promise<string | null> => {
@@ -631,7 +630,7 @@ export const getGitStatus = memoize(async (): Promise<string | null> => {
 
 ### 7.7.2 系统上下文构建
 
-getSystemContext（第 116-149 行）：
+getSystemContext：
 
 ```typescript
 export const getSystemContext = memoize(async () => {
@@ -651,7 +650,7 @@ export const getSystemContext = memoize(async () => {
 
 ### 7.7.3 用户上下文构建
 
-getUserContext（第 155-189 行）：
+getUserContext：
 
 ```typescript
 export const getUserContext = memoize(async () => {
@@ -676,7 +675,7 @@ export const getUserContext = memoize(async () => {
 
 ### 7.7.4 缓存破坏机制
 
-systemPromptInjection 用于调试时的缓存破坏（第 23-34 行）：
+systemPromptInjection 用于调试时的缓存破坏：
 
 ```typescript
 let systemPromptInjection: string | null = null;

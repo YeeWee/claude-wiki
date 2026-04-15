@@ -1,5 +1,7 @@
 # Chapter 43: 远程设置同步
 
+> 本章基于 Claude Code 源代码分析，请以最新版本为准。
+
 ## 43.1 概述
 
 远程设置同步（Remote Managed Settings）是 Claude Code 为企业用户提供的一项核心功能，允许企业管理员通过远程 API 统一管理和分发配置。该系统实现了设置的中心化管理，支持企业级部署场景下的配置同步和安全管控。
@@ -30,7 +32,7 @@ src/services/remoteManagedSettings/
 `types.ts` 定义了远程设置响应的数据结构：
 
 ```typescript
-// types.ts:10-20
+// types.ts - RemoteManagedSettingsResponseSchema 定义区域
 export const RemoteManagedSettingsResponseSchema = lazySchema(() =>
   z.object({
     uuid: z.string(),         // 设置 UUID
@@ -59,11 +61,11 @@ export type RemoteManagedSettingsFetchResult = {
 
 **syncCacheState.ts**（叶子模块，无 auth 导入）：
 ```typescript
-// syncCacheState.ts:34-35
+// syncCacheState.ts - 缓存状态定义区域（叶子模块，无 auth 导入）
 let sessionCache: SettingsJson | null = null
 let eligible: boolean | undefined   // 三态：undefined/false/true
 
-// syncCacheState.ts:70-96
+// syncCacheState.ts - getRemoteManagedSettingsSyncFromCache 函数区域
 export function getRemoteManagedSettingsSyncFromCache(): SettingsJson | null {
   if (eligible !== true) return null        // 未确定或不符合资格
   if (sessionCache) return sessionCache     // 已缓存
@@ -79,7 +81,7 @@ export function getRemoteManagedSettingsSyncFromCache(): SettingsJson | null {
 
 **syncCache.ts**（资格检查模块，依赖 auth）：
 ```typescript
-// syncCache.ts:49-111
+// syncCache.ts - isRemoteManagedSettingsEligible 函数区域（资格检查模块，依赖 auth）
 export function isRemoteManagedSettingsEligible(): boolean {
   if (cached !== undefined) return cached
 
@@ -186,7 +188,7 @@ sequenceDiagram
 Checksum 用于 HTTP ETag 缓存，必须与服务端 Python 实现兼容：
 
 ```typescript
-// index.ts:112-137
+// index.ts - sortKeysDeep 和 computeChecksumFromSettings 函数区域
 function sortKeysDeep(obj: unknown): unknown {
   if (Array.isArray(obj)) {
     return obj.map(sortKeysDeep)
@@ -218,7 +220,7 @@ export function computeChecksumFromSettings(settings: SettingsJson): string {
 ### 43.3.3 网络请求与重试
 
 ```typescript
-// index.ts:209-242
+// index.ts - fetchWithRetry 函数区域（重试机制）
 async function fetchWithRetry(cachedChecksum?: string): Promise<RemoteManagedSettingsFetchResult> {
   let lastResult: RemoteManagedSettingsFetchResult | null = null
 
@@ -246,7 +248,7 @@ async function fetchWithRetry(cachedChecksum?: string): Promise<RemoteManagedSet
 ### 43.3.4 响应处理
 
 ```typescript
-// index.ts:248-361
+// index.ts - fetchRemoteManagedSettings 函数区域（响应处理）
 async function fetchRemoteManagedSettings(cachedChecksum?: string): Promise<RemoteManagedSettingsFetchResult> {
   // 刷新 OAuth Token 防止 401
   await checkAndRefreshOAuthTokenIfNeeded()
@@ -297,7 +299,7 @@ async function fetchRemoteManagedSettings(cachedChecksum?: string): Promise<Remo
 ### 43.3.5 文件缓存
 
 ```typescript
-// index.ts:367-386
+// index.ts - saveSettings 函数区域（文件缓存写入）
 async function saveSettings(settings: SettingsJson): Promise<void> {
   const path = getSettingsPath()  // ~/.claude/remote-settings.json
   const handle = await open(path, 'w', 0o600)  // 仅用户可读写
@@ -317,7 +319,7 @@ async function saveSettings(settings: SettingsJson): Promise<void> {
 ### 43.3.6 后台轮询
 
 ```typescript
-// index.ts:612-628
+// index.ts - startBackgroundPolling 函数区域（后台轮询启动）
 export function startBackgroundPolling(): void {
   if (pollingIntervalId !== null) return
   if (!isRemoteManagedSettingsEligible()) return
@@ -359,7 +361,7 @@ async function pollRemoteSettings(): Promise<void> {
 当远程设置包含危险配置时，系统会弹出确认对话框：
 
 ```typescript
-// securityCheck.tsx:22-61
+// securityCheck.tsx - checkManagedSettingsSecurity 函数区域
 export async function checkManagedSettingsSecurity(
   cachedSettings: SettingsJson | null,
   newSettings: SettingsJson | null
@@ -393,7 +395,7 @@ export async function checkManagedSettingsSecurity(
 ### 43.4.2 危险设置定义
 
 ```typescript
-// utils.ts:24-70
+// utils.ts - extractDangerousSettings 函数区域
 export function extractDangerousSettings(settings: SettingsJson | null): DangerousSettings {
   // 危险 Shell 设置
   const shellSettings: Partial<Record<DangerousShellSetting, string>> = {}
@@ -428,7 +430,7 @@ export function extractDangerousSettings(settings: SettingsJson | null): Dangero
 ### 43.4.3 变更对比
 
 ```typescript
-// utils.ts:87-117
+// utils.ts - hasDangerousSettingsChanged 函数区域
 export function hasDangerousSettingsChanged(
   oldSettings: SettingsJson | null,
   newSettings: SettingsJson | null
@@ -465,7 +467,7 @@ export function hasDangerousSettingsChanged(
 `changeDetector.ts` 提供统一的设置变更通知机制：
 
 ```typescript
-// changeDetector.ts:482-488
+// changeDetector.ts - settingsChangeDetector 对象定义区域
 export const settingsChangeDetector = {
   initialize,    // 启动文件监听
   dispose,       // 清理资源
@@ -478,7 +480,7 @@ export const settingsChangeDetector = {
 ### 43.5.2 文件监听
 
 ```typescript
-// changeDetector.ts:103-146
+// changeDetector.ts - chokidar.watch 配置区域
 watcher = chokidar.watch(dirs, {
   persistent: true,
   ignoreInitial: true,
@@ -510,7 +512,7 @@ watcher.on('add', handleAdd)
 ### 43.5.3 删除处理与优雅期
 
 ```typescript
-// changeDetector.ts:330-360
+// changeDetector.ts - handleDelete 函数区域
 function handleDelete(path: string): void {
   const source = getSourceForPath(path)
   if (!source) return
@@ -538,7 +540,7 @@ function handleDelete(path: string): void {
 ### 43.5.4 内部写入标记
 
 ```typescript
-// changeDetector.ts:284-286
+// changeDetector.ts - consumeInternalWrite 检查区域
 if (consumeInternalWrite(path, INTERNAL_WRITE_WINDOW_MS)) {
   return  // Claude Code 自身写入，忽略
 }
@@ -551,7 +553,7 @@ if (consumeInternalWrite(path, INTERNAL_WRITE_WINDOW_MS)) {
 ### 43.5.5 MDM 设置轮询
 
 ```typescript
-// changeDetector.ts:381-418
+// changeDetector.ts - startMdmPoll 函数区域
 function startMdmPoll(): void {
   // 捕获初始快照
   const initial = getMdmSettings()
@@ -578,7 +580,7 @@ function startMdmPoll(): void {
 ### 43.5.6 通知分发
 
 ```typescript
-// changeDetector.ts:437-450
+// changeDetector.ts - fanOut 函数区域
 function fanOut(source: SettingSource): void {
   resetSettingsCache()        // 先清除缓存
   settingsChanged.emit(source) // 再通知所有监听者
